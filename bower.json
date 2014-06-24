@@ -1,7 +1,7 @@
 {
     "name": "flux-tools",
-    "version": "0.0.3",
-    "main": "./build",
+    "version": "0.0.4",
+    "main": ".",
     "ignore": [
         "node_modules",
         "*.json",
@@ -9,6 +9,8 @@
         "src",
         "tasks",
         "package.json",
-        "*.js"
+        "gruntfile.js",
+        "browserify.js",
+        "README.md"
     ]
 }
