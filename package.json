@@ -1,0 +1,36 @@
+{
+  "name": "flux-tools",
+  "version": "0.0.1",
+  "description": "Tools for the flux architecture.",
+  "main": "gruntfile.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmcriffey/flux-tools"
+  },
+  "keywords": [
+    "flux"
+  ],
+  "author": "Jeff McRiffey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jmcriffey/flux-tools/issues"
+  },
+  "homepage": "https://github.com/jmcriffey/flux-tools",
+  "devDependencies": {
+    "browserify": "^4.1.11",
+    "chai": "^1.9.1",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.5.0",
+    "grunt-istanbul-coverage": "0.0.5",
+    "grunt-mocha-test": "^0.11.0",
+    "jsdom": "^0.11.0",
+    "grunt-blanket": "0.0.8",
+    "blanket": "^1.1.6"
+  }
+}
