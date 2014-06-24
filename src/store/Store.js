@@ -60,33 +60,143 @@ Store.prototype = {
     /**
      * @method add
      * Adds a datum to the store.
-     * @param {Object} item - The config item.
-     * @param {*} item.data - The data to store.
-     * @param {Number} item.index[item.index=this.data.length] - The position to insert the data.
-     * @param {Number|String} item.id[item.id=Date.now()] - A unique id for the data.
+     * @param {Object} record - The record to add.
+     * @param {*} record.data - The data to store.
+     * @param {Number|String} record.id[record.id=Date.now()] - A unique id for the data.
+     * @param {Number} index[index=this.length] - The position to insert the data.
+     * @returns {Object|undefined} - The record or undefined.
      */
-    add: function(item) {
-        var id = item.id !== undefined ? item.id : Date.now();
-        var index = item.index !== undefined ? item.index : this._data.length;
+    add: function(record, index) {
+        var id = record.id !== undefined ? record.id : Date.now();
 
-        this._data.splice(index, 0, {
-            id: id,
-            data: item.data
+        if (record.data !== undefined) {
+            this._data.splice(index !== undefined ? index : this.length, 0, {
+                data: record.data, id: id
+            });
+
+            return record;
+        }
+
+        return;
+    },
+
+    /**
+     * @method load
+     * Loads in a set of records. Clears the store by default.
+     * @param {[Object]} records - An array of records to add to the store.
+     * @params {Boolean} append[append=false] - True to append the records instead of replacing records.
+     * @returns {Number} - The number of records successfully added.
+     */
+    load: function(records, append) {
+        var added = 0;
+        append = append !== undefined ? append : false;
+
+        if (!append) {
+            this.removeAll();
+        }
+
+        for (var i = 0, len = records.length; i < len; i++) {
+            if (this.add(records[i])) {
+                added++;
+            }
+        }
+
+        return added;
+    },
+
+    /**
+     * @method findOne
+     * Finds and returns all data using the given predicate.
+     * @param {Function} fn - The fn used to find an item.
+     * @returns {Object} - An array of matched data.
+     */
+    find: function(fn) {
+        var records = [];
+
+        for (var i = 0, len = this.length; i < len; i++) {
+            if (fn(this._data[i])) {
+                records.push(this._data[i]);
+            }
+        }
+
+        return records;
+    },
+
+    /**
+     * @method findById
+     * Finds and returns a datum by the given id.
+     * @param {Number|String} id - The id to find.
+     */
+    findById: function(id) {
+        return this.findOne(function(record) {
+            return record.id === id;
         });
     },
 
     /**
-     * @method remove
-     * Removes a datum from the store.
-     * @param {Number|String} id - The id to remove.
+     * @method findOne
+     * Finds and returns a datum using the given function.
+     * @param {Function} fn - The fn used to find an item.
+     * @returns {Object} - The first datum matched.
      */
-    remove: function(id) {
-        for (var i = 0, len = this._data.length; i < len; i++) {
-            if (this._data[i].id === id) {
-                this._data.splice(i, 1);
-                break;
+    findOne: function(fn) {
+        for (var i = 0, len = this.length; i < len; i++) {
+            if (fn(this._data[i])) {
+                return this._data[i];
             }
         }
+    },
+
+    /**
+     * @method remove
+     * Removes data from the store using the given function.
+     * Removes all data that matches the predicate.
+     * @param {Function} fn - The fn used to remove an item.
+     */
+    remove: function(fn) {
+        var removed = 0;
+
+        while (this.removeOne(fn)) {
+            removed++;
+        }
+
+        return removed;
+    },
+
+    /**
+     * @removeById
+     * Removes a datum from the store by id.
+     * @param {Number|String} id - The id to remove.
+     */
+    removeById: function(id) {
+        return this.removeOne(function(record) {
+            return record.id === id;
+        });
+    },
+
+    /**
+     * @method removeOne
+     * Removes a single datum from the store using the given function.
+     * Removes the first datum that matches the predicate.
+     * @param {Function} fn - The fn used to remove an item.
+     */
+    removeOne: function(fn) {
+        for (var i = 0, len = this.length; i < len; i++) {
+            if (fn(this._data[i])) {
+                this._data.splice(i, 1);
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    /**
+     * @method removeAll
+     * Removes all data from the store.
+     */
+    removeAll: function() {
+        this._data = [];
     },
 
     /**

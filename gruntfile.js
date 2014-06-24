@@ -66,8 +66,10 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('lint', ['jshint']);
+    grunt.registerTask('unitTest', ['clean:coverage', 'mochaTest', 'readCoverage']);
     grunt.registerTask('build', ['browserify', 'uglify']);
-    grunt.registerTask('test', ['clean:coverage', 'mochaTest', 'readCoverage']);
+    grunt.registerTask('test', ['lint', 'unitTest']);
+    grunt.registerTask('publish', ['test', 'build']);
 
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-clean');

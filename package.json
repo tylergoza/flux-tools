@@ -2,9 +2,10 @@
   "name": "flux-tools",
   "version": "0.0.1",
   "description": "Tools for the flux architecture.",
-  "main": "gruntfile.js",
+  "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "prepublish": "grunt publish"
   },
   "repository": {
     "type": "git",
