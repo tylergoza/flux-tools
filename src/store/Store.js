@@ -90,7 +90,7 @@ Store.prototype = {
     },
 
     /**
-     * @type {Number} count
+     * @type {Number} length
      * The number of data items in the store.
      */
     get length() {
