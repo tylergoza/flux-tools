@@ -14,7 +14,13 @@ var Store = function() {
 
     //register the store with the dispatcher
     Dispatcher.register(function(action, data) {
-        this._emitter.emit(action, data);
+        if (this._emitter.listeners(action).length) {
+            this._emitter.emit(action, data);
+
+            if (action !== 'change') { //emit change for other listeners
+                this._emitter.emit('change', data);
+            }
+        }
     }.bind(this));
 };
 
@@ -39,29 +45,7 @@ Store.prototype = {
      * @returns {Object} - A handler for removing the listener.
      */
      on: function(name, callback) {
-        var fn;
-
-        if (name === 'change') {
-            fn = function(data) { //do not emit change
-                callback(data);
-
-                return true;
-            };
-        } else {
-            fn = function(data) { //emit change
-                callback(data);
-                this._emitter.emit('change', data);
-
-                return true;
-            }.bind(this);
-        }
-
-        this._emitter.addListener(name, fn); //add the listener
-
-        return {
-            name: name,
-            callback: fn
-        };
+        this._emitter.addListener(name, callback); //add the listener
     },
 
     /**
@@ -69,8 +53,8 @@ Store.prototype = {
      * Removes an event listener.
      * @param {String} name - The name of the subscription to cancel.
      */
-    un: function(handler) {
-        this._emitter.removeListener(handler.name, handler.callback);
+    un: function(name, callback) {
+        this._emitter.removeListener(name, callback);
     },
 
     /**

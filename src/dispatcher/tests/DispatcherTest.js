@@ -9,15 +9,15 @@ describe('Dispatcher', function() {
             counts[name] += i;
         });
 
-        Dispatcher.dispatch('test1', 1)
+        Dispatcher.dispatch('test1', 1);
         assert.equal(counts.test1, 1);
         assert.equal(counts.test2, 0);
 
-        Dispatcher.dispatch('test1', 2)
+        Dispatcher.dispatch('test1', 2);
         assert.equal(counts.test1, 3);
         assert.equal(counts.test2, 0);
 
-        Dispatcher.dispatch('test2', 5)
+        Dispatcher.dispatch('test2', 5);
         assert.equal(counts.test1, 3);
         assert.equal(counts.test2, 5);
 

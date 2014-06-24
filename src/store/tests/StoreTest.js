@@ -4,7 +4,6 @@ var Store = require('../Store');
 
 describe('Store', function() {
     it('should respond to the dispatcher', function() {
-        var handler;
         var store = new Store();
         var addCount = 0;
         var changeCount = 0;
@@ -15,7 +14,7 @@ describe('Store', function() {
             changeCount += i - 1;
         };
 
-        handler = store.on('add', addFn);
+        store.on('add', addFn);
         store.on('change', changeFn);
 
         Dispatcher.dispatch('add', 5);
@@ -26,7 +25,7 @@ describe('Store', function() {
         assert.equal(addCount, 5);
         assert.equal(changeCount, 4);
 
-        store.un(handler);
+        store.un('add', addFn);
         Dispatcher.dispatch('add', 5);
         assert.equal(addCount, 5);
         assert.equal(changeCount, 4);
