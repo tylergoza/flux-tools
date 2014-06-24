@@ -1,7 +1,14 @@
 'use strict';
 
 module.exports = function(grunt) {
-    var lintFiles = ['*.js', 'tasks/*.js', 'src/*.js', 'src/**/*.js'];
+    var lintFiles = [
+        '*.js',
+        'tasks/*.js',
+        'src/*.js',
+        'src/**/*.js',
+        '!flux-tools.js',
+        '!flux-tools.min.js'
+    ];
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
