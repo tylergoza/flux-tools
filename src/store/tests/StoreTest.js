@@ -32,7 +32,7 @@ describe('Store', function() {
         assert.equal(changeCount, 4);
     });
 
-    it('should add data', function() {
+    it('should add and remove data', function() {
         var store = new Store();
 
         store.add({
