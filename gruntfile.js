@@ -54,7 +54,7 @@ module.exports = function(grunt) {
         uglify: {
             build: {
                 files: {
-                    'flux-tools.min.js': 'build/flux-tools.js'
+                    'flux-tools.min.js': 'flux-tools.js'
                 }
             }
         }
