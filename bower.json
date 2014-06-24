@@ -8,7 +8,7 @@
         ".*",
         "src",
         "tasks",
-        "package.json"
+        "package.json",
         "*.js"
     ]
 }
