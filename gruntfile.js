@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         browserify: {
             build: {
                 files: {
-                    'build/flux-tools.js': ['browserify.js']
+                    'flux-tools.js': ['browserify.js']
                 }
             }
         },
@@ -54,7 +54,7 @@ module.exports = function(grunt) {
         uglify: {
             build: {
                 files: {
-                    'build/flux-tools.min.js': 'build/flux-tools.js'
+                    'flux-tools.min.js': 'build/flux-tools.js'
                 }
             }
         }
