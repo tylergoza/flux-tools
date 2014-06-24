@@ -69,8 +69,10 @@ module.exports = function(grunt) {
     grunt.registerTask('build', ['browserify', 'uglify']);
     grunt.registerTask('test', ['clean:coverage', 'mochaTest', 'readCoverage']);
 
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadTasks('tasks');
 };
