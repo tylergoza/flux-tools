@@ -1,0 +1,14 @@
+{
+    "name": "flux-tools",
+    "version": "0.0.2",
+    "main": "./build",
+    "ignore": [
+        "node_modules",
+        "*.json",
+        ".*",
+        "src",
+        "tasks",
+        "package.json"
+        "*.js"
+    ]
+}
