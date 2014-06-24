@@ -1,4 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var Store = require('./src/store/Store');
+var Dispatcher = require('./src/dispatcher/Dispatcher');
+
+global.window.FluxTools = {
+    Store: Store,
+    Dispatcher: Dispatcher
+};
+
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./src/dispatcher/Dispatcher":3,"./src/store/Store":4}],2:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -303,7 +316,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 
 var Dispatcher = {
@@ -335,7 +348,7 @@ var Dispatcher = {
 
 module.exports = Dispatcher;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 'use strict';
 
 var Dispatcher = require('../dispatcher/Dispatcher');
@@ -363,7 +376,6 @@ var Store = function() {
 };
 
 Store.prototype = {
-
     /**
      * @method initActions
      * Initializes the actions for this store.
@@ -548,4 +560,4 @@ Store.prototype = {
 
 module.exports = Store;
 
-},{"../dispatcher/Dispatcher":2,"events":1}]},{},[2,3])
+},{"../dispatcher/Dispatcher":3,"events":2}]},{},[1])

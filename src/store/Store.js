@@ -25,7 +25,6 @@ var Store = function() {
 };
 
 Store.prototype = {
-
     /**
      * @method initActions
      * Initializes the actions for this store.

@@ -8,12 +8,7 @@ module.exports = function(grunt) {
         browserify: {
             build: {
                 files: {
-                    'build/flux-tools.js': [
-                        'src/*.js',
-                        'src/**/*.js',
-                        '!src/tests/*.js',
-                        '!src/**/tests/*.js'
-                    ]
+                    'build/flux-tools.js': ['browserify.js']
                 }
             }
         },
