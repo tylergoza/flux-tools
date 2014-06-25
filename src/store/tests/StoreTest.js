@@ -37,18 +37,18 @@ describe('Store', function() {
         store.add({
             data: 'mock data 1'
         });
-        assert.equal(store.length, 1);
+        assert.equal(store.getCount(), 1);
 
         store.add({
             data: 'mock data 2',
             id: 1
         });
-        assert.equal(store.length, 2);
+        assert.equal(store.getCount(), 2);
 
         store.add({
             data: 'mock data 3'
         }, 0);
-        assert.equal(store.length, 3);
+        assert.equal(store.getCount(), 3);
     });
 
     it('should load data', function() {
@@ -57,7 +57,7 @@ describe('Store', function() {
         store.add({
             data: '1'
         });
-        assert.equal(store.length, 1);
+        assert.equal(store.getCount(), 1);
 
         store.load([{
             id: 1234,
@@ -68,12 +68,12 @@ describe('Store', function() {
         }, {
             badData: '5'
         }]);
-        assert.equal(store.length, 2);
+        assert.equal(store.getCount(), 2);
         assert.deepEqual(store._data[0], {data: '2', id: 1234});
         assert.deepEqual(store._data[1], {data: '3', id: 5678});
 
         store.load([{id: 9012, data: '4'}], true);
-        assert.equal(store.length, 3);
+        assert.equal(store.getCount(), 3);
         assert.deepEqual(store._data[2], {data: '4', id: 9012});
     });
 
@@ -97,20 +97,20 @@ describe('Store', function() {
         }]);
 
         store.removeById(1);
-        assert.equal(store.length, 5);
+        assert.equal(store.getCount(), 5);
 
         store.removeOne(function(record) {
             return record.data === 'mock data 4';
         });
-        assert.equal(store.length, 4);
+        assert.equal(store.getCount(), 4);
 
         store.remove(function(record) {
             return record.data === 'mock data 4';
         });
-        assert.equal(store.length, 2);
+        assert.equal(store.getCount(), 2);
 
         store.removeAll();
-        assert.equal(store.length, 0);
+        assert.equal(store.getCount(), 0);
     });
 
     it('should find items', function() {
