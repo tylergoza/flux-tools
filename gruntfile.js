@@ -38,7 +38,7 @@ module.exports = function(grunt) {
                         });
                     }
                 },
-                src: ['src/tests/*.js', 'src/**/tests/*.js']
+                src: ['src/*.js', 'src/**/*.js']
             },
             htmlCoverage: {
                 options: {
@@ -46,7 +46,7 @@ module.exports = function(grunt) {
                     quiet: true,
                     captureFile: '.coverage/coverage.html'
                 },
-                src: ['src/tests/*.js', 'src/**/tests/*.js']
+                src: ['src/*.js', 'src/**/*.js']
             },
             jsonCoverage: {
                 options: {
@@ -54,7 +54,7 @@ module.exports = function(grunt) {
                     quiet: true,
                     captureFile: '.coverage/coverage.json'
                 },
-                src: ['src/tests/*.js', 'src/**/tests/*.js']
+                src: ['src/*.js', 'src/**/*.js']
             }
         },
         readCoverage: {files: {}},
