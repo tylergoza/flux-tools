@@ -25,7 +25,7 @@ I suggest [es5-shim](https://github.com/es-shims/es5-shim) for legacy support.
 
 A `Store` is a collection class that manages events and handles actions.
 A `Store` manages records, which are simple objects containing at least a `data` key and optionally an `id` key.
-A record added to a store without and id is automatically assigned an id (Date.now()).
+A record added to a store without and id is automatically assigned an id.
 Customized stores should extend the base `Store`.
 
 ```

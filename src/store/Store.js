@@ -2,6 +2,7 @@
 
 var Dispatcher = require('../dispatcher/Dispatcher');
 var EventEmitter = require('events').EventEmitter;
+var _uid = Date.now();
 
 /**
  * @constructor
@@ -60,12 +61,12 @@ Store.prototype.un = function(name, callback) {
  * Adds a datum to the store.
  * @param {Object} record - The record to add.
  * @param {*} record.data - The data to store.
- * @param {Number|String} record.id[record.id=Date.now()] - A unique id for the data.
+ * @param {Number|String} record.id[record.id=_uid++] - A unique id for the data.
  * @param {Number} index[index=this.getCount()] - The position to insert the data.
  * @returns {Object|undefined} - The record or undefined.
  */
 Store.prototype.add = function(record, index) {
-    var id = record.id !== undefined ? record.id : Date.now();
+    var id = record.id !== undefined ? record.id : (_uid++).toString(36);
 
     if (record.data !== undefined) {
         this._data.splice(index !== undefined ? index : this.getCount(), 0, {
