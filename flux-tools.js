@@ -386,7 +386,9 @@ Store.prototype.initActions = function() {
  */
 Store.prototype.on = function(name, callback) {
     this.un(name);
-    this._emitter.addListener(name, callback.bind(this));
+    this._emitter.addListener(name, function(data) {
+        callback.call(this, data);
+    }.bind(this));
 };
 
 /**
