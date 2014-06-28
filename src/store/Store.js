@@ -32,9 +32,9 @@ Store.prototype.initActions = function() {
  * The event 'change' is a special listener. It is called by all other listeners.
  * @param {String} name - The name of the subscription.
  * @param {Function} callback - The function to call when {@link name} is emitted.
- * @returns {Object} - A handler for removing the listener.
  */
 Store.prototype.on = function(name, callback) {
+    this.un(name);
     this._emitter.addListener(name, callback);
 };
 
@@ -43,8 +43,8 @@ Store.prototype.on = function(name, callback) {
  * Removes an event listener.
  * @param {String} name - The name of the listener to cancel.
  */
-Store.prototype.un = function(name, callback) {
-    this._emitter.removeListener(name, callback);
+Store.prototype.un = function(name) {
+    this._emitter.removeAllListeners(name);
 };
 
 /**

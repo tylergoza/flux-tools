@@ -23,9 +23,7 @@ I suggest [es5-shim](https://github.com/es-shims/es5-shim) for legacy support.
 
 #### Store
 
-A `Store` is a collection class that manages events and handles actions.
-A `Store` manages records, which are simple objects containing at least a `data` key and optionally an `id` key.
-A record added to a store without and id is automatically assigned an id.
+A `Store` is a fancy array that manages events and data.
 Customized stores should extend the base `Store`.
 
 ```
@@ -33,64 +31,25 @@ var Store = require('flux-tools').Store;
 var coolStore = new Store();
 
 // add a new record
-coolStore.add({
-    data: 'cool data'
-});
+coolStore.create('cool data');
+coolStore.count(); // 1
 
 // add a new record at a given index
-coolStore.add({
-    data: 'cooler data'
-}, 0);
+coolStore.create('cooler data', 0);
+coolStore.count(); // 2
 
-// add a new record with a given id
-coolStore.add({
-    data: 'coolest data',
-    id: '123CoolId'
-});
-myStore.length; // 3
-
-// you can remove items by id
-coolStore.removeById('123CoolId');
-myStore.length; // 2
-
-// you can remove items by a predicate function
+// you can remove items using a predicate function
 // this method removes all matches
 coolStore.remove(function(record) {
     return record.data === 'cool data';
 });
-coolStore.length; // 1
+coolStore.count(); // 1
 
-// you can also remove a single item by a predicate function
-// this method removes the first match
-coolStore.removeOne(function(record) {
-    return record.data === 'cooler data';
-});
-coolStore.length; // 0
-
-// you can load many records with a single call
-// this replaces all the data in the store
-coolStore.load([{data: 'coolest data', id: 10}, {data: 'cool to the max data'}]);
-coolStore.length; // 2
-
-// if you don't want to replace all the data, pass true as the 2nd parameter to load
-coolStore.load([{data: 'more cool data'}], true);
-coolStore.length; // 3
-
-// you can find records by id
-coolStore.findById(10); // {data: 'coolest data', id: 10}
-
-// you can find records by predicate
+// you can find records using a predicate function
 // this method returns all matches
-coolStore.find(function(record) {
-    return record.data.indexOf('cool') !== -1;
-}); // [{data: 'coolest data', id: 10}, {data: 'cool to the max data'}]
-
-// you can also find a single record by predicate, if that's what you dig
-// this method returns the first match
-coolStore.findOne(function(record) {
-    return record.data.indexOf('cool') !== -1;
-}); // {data: 'coolest data', id: 10}
-
+coolStore.filter(function(data) {
+    return data === 'cooler data';
+}); // ['cooler data']
 ```
 
 #### Dispatcher
@@ -119,5 +78,8 @@ coolStore.on('cool_stuff', function(data) {
 Dispatcher.dispatch('cool_stuff', {
     msg: 'awesomeness'
 });
+
+// this cancels the 'cool_stuff' event listener on the store
+coolStore.un('cool_stuff');
 ```
 
