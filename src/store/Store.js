@@ -35,7 +35,7 @@ Store.prototype.initActions = function() {
  */
 Store.prototype.on = function(name, callback) {
     this.un(name);
-    this._emitter.addListener(name, callback);
+    this._emitter.addListener(name, callback.bind(this));
 };
 
 /**
