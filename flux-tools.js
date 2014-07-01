@@ -443,11 +443,20 @@ Store.prototype.destroy = function(fn) {
 
 /**
  * @method sort
- * Sorts the stores data given the sort method.
+ * Sorts the store's data given the sort method.
  * @returns {[*]} - The sorted data.
  */
 Store.prototype.sort = function(sortFn) {
     return this._data.sort(sortFn);
+};
+
+/**
+ * @method reverse
+ * Reverses the store's data.
+ * @returns {[*]} - The reversed data.
+ */
+Store.prototype.reverse = function() {
+    return this._data.reverse();
 };
 
 /**

@@ -97,6 +97,22 @@ describe('Store', function() {
         assert.deepEqual(store.at(2), {age: 1});
     });
 
+    it('should reverse data', function() {
+        var store = new Store([{
+            age: 1
+        }, {
+            age: 55
+        }, {
+            age: 11
+        }]);
+
+        store.reverse();
+
+        assert.deepEqual(store.at(0), {age: 11});
+        assert.deepEqual(store.at(1), {age: 55});
+        assert.deepEqual(store.at(2), {age: 1});
+    });
+
     it('should remove data', function() {
         var store = new Store([
             'mock data 1',
