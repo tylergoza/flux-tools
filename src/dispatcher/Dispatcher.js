@@ -24,6 +24,14 @@ var Dispatcher = {
         this._callbacks.forEach(function(callback) {
             callback(name, data);
         });
+    },
+
+    /**
+     * @method empty
+     * Clears all of the callbacks.
+     */
+    empty: function() {
+        this._callbacks = [];
     }
 };
 

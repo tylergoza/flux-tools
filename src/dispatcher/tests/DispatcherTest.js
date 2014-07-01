@@ -24,4 +24,13 @@ describe('Dispatcher', function() {
         //clean up
         Dispatcher._callbacks = [];
     });
+
+    it('should empty the callbacks', function() {
+        Dispatcher.register(function() {});
+        Dispatcher.register(function() {});
+
+        assert.equal(Dispatcher._callbacks.length, 2);
+        Dispatcher.empty();
+        assert.equal(Dispatcher._callbacks.length, 0);
+    });
 });
