@@ -1,6 +1,6 @@
 {
     "name": "flux-tools",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "main": ".",
     "ignore": [
         "node_modules",

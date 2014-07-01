@@ -442,6 +442,24 @@ Store.prototype.destroy = function(fn) {
 };
 
 /**
+ * @method sort
+ * Sorts the stores data given the sort method.
+ * @returns {[*]} - The sorted data.
+ */
+Store.prototype.sort = function(sortFn) {
+    return this._data.sort(sortFn);
+};
+
+/**
+ * @method at
+ * Gets the item at the given index.
+ * @param {Number} index - The index to get.
+ */
+ Store.prototype.at = function(index) {
+    return this.all()[index];
+ };
+
+/**
  * @method all
  * Gets an array of all data from the store.
  * @returns [*] - All the store's data.
