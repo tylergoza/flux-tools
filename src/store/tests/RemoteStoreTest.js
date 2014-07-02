@@ -129,6 +129,9 @@ describe('RemoteStore', function() {
         store.load();
         assert.equal(openCount, 2);
         assert.equal(sendCount, 2);
+
+        store.clearFilters();
+        assert.deepEqual(store._filters, []);
     });
 
     it('should sort remote data', function() {
@@ -147,6 +150,9 @@ describe('RemoteStore', function() {
         store.load();
         assert.equal(openCount, 2);
         assert.equal(sendCount, 2);
+
+        store.clearSorters();
+        assert.deepEqual(store._sorters, []);
     });
 
     it('should add params', function() {
@@ -165,6 +171,9 @@ describe('RemoteStore', function() {
         store.load();
         assert.equal(openCount, 2);
         assert.equal(sendCount, 2);
+
+        store.clearParams();
+        assert.deepEqual(store._params, {});
     });
 });
 

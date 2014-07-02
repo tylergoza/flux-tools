@@ -125,6 +125,14 @@ RemoteStore.prototype.removeFilter = function(property, value) {
 };
 
 /**
+ * @method clearFilters
+ * Removes all filters.
+ */
+RemoteStore.prototype.clearFilters = function() {
+    this._filters = [];
+};
+
+/**
  * @method addSorter
  * Adds a sorter to the store.
  * @param {String} property - The property to sort on.
@@ -139,7 +147,7 @@ RemoteStore.prototype.addSorter = function(property, direction) {
 
 /**
  * @method removeSorter
- * Removes all sorter that have the given property and direction.
+ * Removes all sorters that have the given property and direction.
  * @param {String} property - The property to sort on.
  * @param {String} direction - The direction to sort.
  */
@@ -147,6 +155,14 @@ RemoteStore.prototype.removeSorter = function(property, direction) {
     this._sorters = this._sorters.filter(function(filter) {
         return !(filter.property === property && filter.direction === direction);
     });
+};
+
+/**
+ * @method clearSorters
+ * Removes all sorters.
+ */
+RemoteStore.prototype.clearSorters = function() {
+    this._sorters = [];
 };
 
 /**
@@ -166,6 +182,14 @@ RemoteStore.prototype.addParam = function(param, value) {
  */
 RemoteStore.prototype.removeParam = function(param) {
     delete this._params[param];
+};
+
+/**
+ * @method clearParams
+ * Removes all params.
+ */
+RemoteStore.prototype.clearParams = function() {
+    this._params = {};
 };
 
 /**
