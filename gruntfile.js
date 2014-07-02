@@ -33,6 +33,23 @@ module.exports = function(grunt) {
                 options: {
                     reporter: 'spec',
                     require: function() {
+                        var jsdom = require('jsdom');
+
+                        //build the dom for tests
+                        global.window = jsdom.jsdom().createWindow(
+                            '<!DOCTYPE html>' +
+                            '<html>' +
+                                '<head>' +
+                                    '<meta charset="utf-8">' +
+                                    '<title>Mocha Test</title>' +
+                                '</head>' +
+                                '<body>' +
+                                '</body>' +
+                            '</html>'
+                        );
+                        global.document = global.window.document;
+                        global.navigator = global.window.navigator;
+
                         require('blanket')({
                           pattern: 'src'
                         });

@@ -1,4 +1,5 @@
 {
+    "browser": true,
     "camelcase": true,
     "indent": 4,
     "trailing": true,

@@ -1,7 +1,7 @@
 'use strict';
 
-var Dispatcher = require('../dispatcher/Dispatcher');
 var EventEmitter = require('events').EventEmitter;
+var utils = require('./utils');
 
 /**
  * @constructor
@@ -10,10 +10,10 @@ var EventEmitter = require('events').EventEmitter;
  */
 var Store = function(initialData) {
     this._emitter = new EventEmitter(); /** @private */
-    this._data = Array.isArray(initialData) ? initialData : []; /** @private */
+    this._data = Array.isArray(initialData) ? initialData.slice() : []; /** @private */
 
     this.initActions();
-    registerStore(this);
+    utils.registerStore(this);
 };
 
 /**
@@ -62,7 +62,7 @@ Store.prototype.create = function(data, index) {
 /**
  * @method filter
  * Finds data using the given function.
- * Finds all data that matches the predicate
+ * Finds all data that matches the predicate.
  * @param {Function} fn - The predicate used to find items.
  * @returns {[*]} - An array of matched data.
  */
@@ -129,27 +129,10 @@ Store.prototype.empty = function() {
 /**
  * @method count
  * Gets the number of data items in the store.
- * @returns {Number}
+ * @returns {Number} - The number of data items in the store.
  */
 Store.prototype.count = function() {
     return this._data.length;
 };
-
-/**
- * @private
- * @method registerStore
- * Registers the store with the Dispatcher.
- */
-function registerStore(store) {
-    Dispatcher.register(function(action, data) {
-        if (store._emitter.listeners(action).length) {
-            store._emitter.emit(action, data);
-
-            if (action !== 'change') { //emit change for other listeners
-                store._emitter.emit('change', data);
-            }
-        }
-    }.bind(store));
-}
 
 module.exports = Store;
