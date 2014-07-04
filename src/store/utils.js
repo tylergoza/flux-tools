@@ -19,7 +19,7 @@ function registerStore(store) {
 /**
  * @method buildUrl
  * Builds a url for a given remote store.
- * @param {Object] store - The remote store for which to build a url.
+ * @param {Object} store - The remote store for which to build a url.
  * @returns {String} - The built url.
  */
 function buildUrl(store) {
