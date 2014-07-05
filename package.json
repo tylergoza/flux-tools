@@ -1,6 +1,6 @@
 {
   "name": "flux-tools",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Tools for the flux architecture.",
   "main": "index.js",
   "scripts": {
