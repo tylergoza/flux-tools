@@ -6,7 +6,7 @@ var Dispatcher = require('../dispatcher/Dispatcher');
  */
 function registerStore(store) {
     Dispatcher.register(function(action, data) {
-        if (store._emitter.listeners(action).length) {
+        if (store._emitter.hasListener(action)) {
             store._emitter.emit(action, data);
 
             if (action !== 'change') { //emit change for other listeners

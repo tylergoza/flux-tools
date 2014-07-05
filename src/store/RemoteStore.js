@@ -1,6 +1,6 @@
 'use strict';
 
-var EventEmitter = require('events').EventEmitter;
+var Emitter = require('../emitter/Emitter');
 var utils = require('./utils');
 
 /**
@@ -27,7 +27,7 @@ var RemoteStore = function(cfg) {
         }
     });
 
-    this._emitter = new EventEmitter(); /** @private */
+    this._emitter = new Emitter(); /** @private */
     this._data = []; /** @private */
     this._meta = {}; /** @private */
     this._url = cfg.url; /** @private */
@@ -73,7 +73,7 @@ RemoteStore.prototype.on = function(name, callback) {
  * @param {String} name - The name of the listener to cancel.
  */
 RemoteStore.prototype.un = function(name) {
-    this._emitter.removeAllListeners(name);
+    this._emitter.removeListener(name);
 };
 
 /**
