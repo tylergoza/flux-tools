@@ -1,14 +1,79 @@
 'use strict';
 
 module.exports = function(grunt) {
-    var lintFiles = [
-        '*.js',
-        'tasks/*.js',
-        'src/*.js',
-        'src/**/*.js',
-        '!flux-tools.js',
-        '!flux-tools.min.js'
-    ];
+    /**
+     * @method registerTasks
+     * Registers grunt tasks for command line usage.
+     */
+    function registerTasks() {
+        grunt.registerTask('unitTest', ['clean:coverage', 'mochaTest', 'reportCoverage']);
+        grunt.registerTask('build', ['browserify', 'uglify']);
+        grunt.registerTask('test', ['jshint', 'unitTest']);
+        grunt.registerTask('publish', ['test', 'build']);
+    }
+
+    /**
+     * @method registerReportCoverage
+     * Registers a task that can read the blanket coverage report.
+     */
+    function registerReportCoverage() {
+        grunt.registerMultiTask('reportCoverage', 'Reads and reports a coverage json file', function() {
+            var result = grunt.file.readJSON('.coverage/coverage.json');
+
+            if (result.coverage < 100) {
+                grunt.fail.warn(
+                    'Expected coverage to be 100%, but was ' + result.coverage.toFixed(2) + '%.\n' +
+                    'See ".coverage/coverage.html" for details.'
+                );
+            } else {
+                grunt.log.ok('Code coverage is 100%. Reward yourself with a burrito.');
+            }
+        });
+    }
+
+    /**
+     * @method loadNpmTasks
+     * Loads tasks from installed grunt plugins.
+     */
+    function loadNpmTasks() {
+        var npmTasks = [
+            'grunt-browserify',
+            'grunt-contrib-clean',
+            'grunt-contrib-jshint',
+            'grunt-contrib-uglify',
+            'grunt-mocha-test'
+        ];
+
+        npmTasks.forEach(function(task) {
+            grunt.loadNpmTasks(task);
+        });
+    }
+
+    /**
+     * @method mochaHarness
+     * Sets up the environment for running Mocha tests.
+     * Creates a jsdom window.
+     */
+    function mochaHarness() {
+        var jsdom = require('jsdom');
+
+        //build the dom for tests
+        global.window = jsdom.jsdom().createWindow(
+            '<!DOCTYPE html>' +
+            '<html>' +
+                '<head>' +
+                    '<meta charset="utf-8">' +
+                    '<title>Mocha Test</title>' +
+                '</head>' +
+                '<body>' +
+                '</body>' +
+            '</html>'
+        );
+        global.document = global.window.document;
+        global.navigator = global.window.navigator;
+
+        require('blanket')({pattern: 'src'});
+    }
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -24,7 +89,14 @@ module.exports = function(grunt) {
         },
         jshint: {
             lint: {
-                src: lintFiles,
+                src: [
+                    '*.js',
+                    'tasks/*.js',
+                    'src/*.js',
+                    'src/**/*.js',
+                    '!flux-tools.js',
+                    '!flux-tools.min.js'
+                ],
                 options: {jshintrc: '.jshintrc'}
             }
         },
@@ -32,28 +104,7 @@ module.exports = function(grunt) {
             test: {
                 options: {
                     reporter: 'spec',
-                    require: function() {
-                        var jsdom = require('jsdom');
-
-                        //build the dom for tests
-                        global.window = jsdom.jsdom().createWindow(
-                            '<!DOCTYPE html>' +
-                            '<html>' +
-                                '<head>' +
-                                    '<meta charset="utf-8">' +
-                                    '<title>Mocha Test</title>' +
-                                '</head>' +
-                                '<body>' +
-                                '</body>' +
-                            '</html>'
-                        );
-                        global.document = global.window.document;
-                        global.navigator = global.window.navigator;
-
-                        require('blanket')({
-                          pattern: 'src'
-                        });
-                    }
+                    require: [mochaHarness]
                 },
                 src: ['src/*.js', 'src/**/*.js']
             },
@@ -74,7 +125,7 @@ module.exports = function(grunt) {
                 src: ['src/*.js', 'src/**/*.js']
             }
         },
-        readCoverage: {files: {}},
+        reportCoverage: {files: {}},
         uglify: {
             build: {
                 files: {
@@ -84,16 +135,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('lint', ['jshint']);
-    grunt.registerTask('unitTest', ['clean:coverage', 'mochaTest', 'readCoverage']);
-    grunt.registerTask('build', ['browserify', 'uglify']);
-    grunt.registerTask('test', ['lint', 'unitTest']);
-    grunt.registerTask('publish', ['test', 'build']);
-
-    grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-mocha-test');
-    grunt.loadTasks('tasks');
+    registerTasks();
+    registerReportCoverage();
+    loadNpmTasks();
 };

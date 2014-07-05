@@ -128,6 +128,24 @@ describe('Store', function() {
         assert.equal(store.count(), 2);
     });
 
+    it('should remove data at an index', function() {
+        var store = new Store([
+            'mock data 1',
+            'mock data 2',
+            'mock data 1',
+            'mock data 3'
+        ]);
+
+        assert.equal(store.count(), 4);
+        store.destroyAt(1);
+        assert.equal(store.count(), 3);
+        assert.deepEqual(store.all(), [
+            'mock data 1',
+            'mock data 1',
+            'mock data 3'
+        ]);
+    });
+
     it('should empty data', function() {
         var store = new Store(['mock data 1']);
 

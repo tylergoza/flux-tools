@@ -82,6 +82,15 @@ Store.prototype.destroy = function(fn) {
 };
 
 /**
+ * @method destroyAt
+ * Removes data at the given index.
+ * @param {Number} index - The index at which to remove data.
+ */
+Store.prototype.destroyAt = function(i) {
+    this._data.splice(i, 1);
+};
+
+/**
  * @method sort
  * Sorts the store's data given the sort method.
  * @returns {[*]} - The sorted data.
