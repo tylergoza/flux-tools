@@ -40,7 +40,7 @@ coolStore.count(); // 2
 
 // you can remove items using a predicate function
 // this method removes all matches
-coolStore.remove(function(record) {
+coolStore.destroy(function(record) {
     return record.data === 'cool data';
 });
 coolStore.count(); // 1
