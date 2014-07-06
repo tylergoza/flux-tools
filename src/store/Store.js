@@ -6,7 +6,7 @@ var utils = require('./utils');
 /**
  * @constructor
  * Creates a new store.
- * @param {[*]} initialData - An array of initial data.
+ * @param {*[]} initialData - An array of initial data.
  */
 var Store = function(initialData) {
     this._emitter = new Emitter(); /** @private */
@@ -63,7 +63,7 @@ Store.prototype.create = function(data, index) {
  * Finds data using the given function.
  * Finds all data that matches the predicate.
  * @param {Function} fn - The predicate used to find items.
- * @returns {[*]} - An array of matched data.
+ * @returns {*[]} - An array of matched data.
  */
 Store.prototype.filter = function(fn) {
     return this._data.filter(fn);
@@ -93,7 +93,7 @@ Store.prototype.destroyAt = function(i) {
 /**
  * @method sort
  * Sorts the store's data given the sort method.
- * @returns {[*]} - The sorted data.
+ * @returns {*[]} - The sorted data.
  */
 Store.prototype.sort = function(sortFn) {
     return this._data.sort(sortFn);
@@ -102,7 +102,7 @@ Store.prototype.sort = function(sortFn) {
 /**
  * @method reverse
  * Reverses the store's data.
- * @returns {[*]} - The reversed data.
+ * @returns {*[]} - The reversed data.
  */
 Store.prototype.reverse = function() {
     return this._data.reverse();
@@ -120,7 +120,7 @@ Store.prototype.reverse = function() {
 /**
  * @method all
  * Gets an array of all data from the store.
- * @returns [*] - All the store's data.
+ * @returns {*[]} - All the store's data.
  */
 Store.prototype.all = function() {
     return this._data.slice();

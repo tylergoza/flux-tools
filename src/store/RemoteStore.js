@@ -6,7 +6,7 @@ var utils = require('./utils');
 /**
  * @constructor
  * Creates a new store.
- * @param {[*]} initialData - An array of initial data.
+ * @param {*[]} initialData - An array of initial data.
  */
 var RemoteStore = function(cfg) {
     var cfgDefaults = {
@@ -195,7 +195,7 @@ RemoteStore.prototype.clearParams = function() {
 /**
  * @method all
  * Gets an array of all data from the store.
- * @returns [*] - All the store's data.
+ * @returns {*[]} - All the store's data.
  */
 RemoteStore.prototype.all = function() {
     return this._data.slice();

@@ -3,6 +3,7 @@ var Dispatcher = require('../dispatcher/Dispatcher');
 /**
  * @method registerStore
  * Registers a store with the Dispatcher.
+ * @param {Object} store - The store to register.
  */
 function registerStore(store) {
     Dispatcher.register(function(action, data) {
