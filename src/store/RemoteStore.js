@@ -50,7 +50,9 @@ var RemoteStore = function(cfg) {
  * @extends Store
  */
 Object.getOwnPropertyNames(Store.prototype).forEach(function(prop) {
-    RemoteStore.prototype[prop] = Store.prototype[prop];
+    if (prop !== 'constructor') {
+        RemoteStore.prototype[prop] = Store.prototype[prop];
+    }
 });
 
 /**
