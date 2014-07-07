@@ -17,7 +17,9 @@ var RemoteStore = function(cfg) {
         params: {},
         rootParam: 'objects',
         sorterParam: 'sorters',
-        sorters: []
+        sorters: [],
+        data: [],
+        meta: {}
     };
     cfg = cfg || {};
 
@@ -28,8 +30,8 @@ var RemoteStore = function(cfg) {
     });
 
     this._emitter = new Emitter(); /** @private */
-    this._data = []; /** @private */
-    this._meta = {}; /** @private */
+    this._data = cfg.data; /** @private */
+    this._meta = cfg.meta; /** @private */
     this._url = cfg.url; /** @private */
     this._filterParam = cfg.filterParam; /** @private */
     this._filters = cfg.filters; /** @private */
