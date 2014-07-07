@@ -105,11 +105,12 @@ module.exports = Emitter;
 'use strict';
 
 var Emitter = require('../emitter/Emitter');
+var Store = require('./Store');
 var utils = require('./utils');
 
 /**
  * @constructor
- * Creates a new store.
+ * Creates a new remote store.
  * @param {*[]} initialData - An array of initial data.
  */
 var RemoteStore = function(cfg) {
@@ -150,37 +151,11 @@ var RemoteStore = function(cfg) {
 };
 
 /**
- * @method initActions
- * Initializes the actions for this store.
- * Should be overridden by sub-classes.
- * Should contain several calls to the 'on' method.
+ * @extends Store
  */
-RemoteStore.prototype.initActions = function() {
-    return;
-};
-
-/**
- * @method on
- * Adds an event listener.
- * The event 'change' is a special listener. It is called by all other listeners.
- * @param {String} name - The name of the subscription.
- * @param {Function} callback - The function to call when {@link name} is emitted.
- */
-RemoteStore.prototype.on = function(name, callback) {
-    this.un(name);
-    this._emitter.addListener(name, function(data) {
-        callback.call(this, data);
-    }.bind(this));
-};
-
-/**
- * @method un
- * Removes an event listener.
- * @param {String} name - The name of the listener to cancel.
- */
-RemoteStore.prototype.un = function(name) {
-    this._emitter.removeListener(name);
-};
+Object.getOwnPropertyNames(Store.prototype).forEach(function(prop) {
+    RemoteStore.prototype[prop] = Store.prototype[prop];
+});
 
 /**
  * @method load
@@ -203,6 +178,24 @@ RemoteStore.prototype.load = function() {
         this._data = data[this._rootParam] || [];
         this._emitter.emit('change', this.all());
     }.bind(this));
+};
+
+/**
+ * @method setUrl
+ * Sets the store's url.
+ * @param {String} url - The new url.
+ */
+RemoteStore.prototype.setUrl = function(url) {
+    this._url = url;
+};
+
+/**
+ * @method getUrl
+ * Gets the store's url.
+ * @returns {String} - The store's url.
+ */
+RemoteStore.prototype.getUrl = function() {
+    return this._url;
 };
 
 /**
@@ -299,15 +292,6 @@ RemoteStore.prototype.clearParams = function() {
 };
 
 /**
- * @method all
- * Gets an array of all data from the store.
- * @returns {*[]} - All the store's data.
- */
-RemoteStore.prototype.all = function() {
-    return this._data.slice();
-};
-
-/**
  * @method meta
  * Gets the store's meta data.
  * @returns {Object} - The store's meta data.
@@ -325,27 +309,9 @@ RemoteStore.prototype.count = function() {
     return this._data.length;
 };
 
-/**
- * @method setUrl
- * Sets the store's url.
- * @param {String} url - The new url.
- */
-RemoteStore.prototype.setUrl = function(url) {
-    this._url = url;
-};
-
-/**
- * @method getUrl
- * Gets the store's url.
- * @returns {String} - The store's url.
- */
-RemoteStore.prototype.getUrl = function() {
-    return this._url;
-};
-
 module.exports = RemoteStore;
 
-},{"../emitter/Emitter":3,"./utils":6}],5:[function(require,module,exports){
+},{"../emitter/Emitter":3,"./Store":5,"./utils":6}],5:[function(require,module,exports){
 'use strict';
 
 var Emitter = require('../emitter/Emitter');

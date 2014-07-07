@@ -1,6 +1,5 @@
 var assert = require('chai').assert;
 
-var Dispatcher = require('../../dispatcher/Dispatcher');
 var RemoteStore = require('../RemoteStore');
 
 describe('RemoteStore', function() {
@@ -49,34 +48,6 @@ describe('RemoteStore', function() {
 
     afterEach(function() {
         global.XMLHttpRequest = function() {};
-    });
-
-    it('should respond to the dispatcher', function() {
-        var store = new RemoteStore();
-        var addCount = 0;
-        var changeCount = 0;
-        var addFn = function(i) {
-            addCount += i;
-        };
-        var changeFn = function(i) {
-            changeCount += i - 1;
-        };
-
-        store.on('add', addFn);
-        store.on('change', changeFn);
-
-        Dispatcher.dispatch('add', 5);
-        assert.equal(addCount, 5);
-        assert.equal(changeCount, 4);
-
-        Dispatcher.dispatch('sub', 5);
-        assert.equal(addCount, 5);
-        assert.equal(changeCount, 4);
-
-        store.un('add', addFn);
-        Dispatcher.dispatch('add', 5);
-        assert.equal(addCount, 5);
-        assert.equal(changeCount, 4);
     });
 
     it('should load remote data', function() {
