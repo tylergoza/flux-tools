@@ -178,7 +178,6 @@ RemoteStore.prototype.load = function() {
         data = JSON.parse(request.responseText);
         this._meta = data[this._metaParam] || {};
         this._data = data[this._rootParam] || [];
-        this._emitter.emit('change', this.all());
     }.bind(this));
 };
 
