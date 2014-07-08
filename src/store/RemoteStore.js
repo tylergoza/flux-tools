@@ -1,5 +1,6 @@
 'use strict';
 
+var Dispatcher = require('../dispatcher/Dispatcher');
 var Emitter = require('../emitter/Emitter');
 var Store = require('./Store');
 var utils = require('./utils');
@@ -43,7 +44,7 @@ var RemoteStore = function(cfg) {
     this._metaParam = cfg.metaParam; /** @private */
 
     this.initActions();
-    utils.registerStore(this);
+    Dispatcher.register(this._emitter.emit.bind(this._emitter));
 };
 
 /**
@@ -74,6 +75,7 @@ RemoteStore.prototype.load = function() {
         data = JSON.parse(request.responseText);
         this._meta = data[this._metaParam] || {};
         this._data = data[this._rootParam] || [];
+        this._emitter.emit('change', this.all());
     }.bind(this));
 };
 

@@ -1,22 +1,3 @@
-var Dispatcher = require('../dispatcher/Dispatcher');
-
-/**
- * @method registerStore
- * Registers a store with the Dispatcher.
- * @param {Object} store - The store to register.
- */
-function registerStore(store) {
-    Dispatcher.register(function(action, data) {
-        if (store._emitter.hasListener(action)) {
-            store._emitter.emit(action, data);
-
-            if (action !== 'change') { //emit change for other listeners
-                store._emitter.emit('change', data);
-            }
-        }
-    }.bind(store));
-}
-
 /**
  * @method buildUrl
  * Builds a url for a given remote store.
@@ -76,7 +57,6 @@ function get(url, callback) {
 }
 
 module.exports = {
-    registerStore: registerStore,
     buildUrl: buildUrl,
     get: get
 };

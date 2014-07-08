@@ -104,6 +104,7 @@ module.exports = Emitter;
 },{}],4:[function(require,module,exports){
 'use strict';
 
+var Dispatcher = require('../dispatcher/Dispatcher');
 var Emitter = require('../emitter/Emitter');
 var Store = require('./Store');
 var utils = require('./utils');
@@ -147,7 +148,7 @@ var RemoteStore = function(cfg) {
     this._metaParam = cfg.metaParam; /** @private */
 
     this.initActions();
-    utils.registerStore(this);
+    Dispatcher.register(this._emitter.emit.bind(this._emitter));
 };
 
 /**
@@ -178,6 +179,7 @@ RemoteStore.prototype.load = function() {
         data = JSON.parse(request.responseText);
         this._meta = data[this._metaParam] || {};
         this._data = data[this._rootParam] || [];
+        this._emitter.emit('change', this.all());
     }.bind(this));
 };
 
@@ -312,11 +314,11 @@ RemoteStore.prototype.count = function() {
 
 module.exports = RemoteStore;
 
-},{"../emitter/Emitter":3,"./Store":5,"./utils":6}],5:[function(require,module,exports){
+},{"../dispatcher/Dispatcher":2,"../emitter/Emitter":3,"./Store":5,"./utils":6}],5:[function(require,module,exports){
 'use strict';
 
+var Dispatcher = require('../dispatcher/Dispatcher');
 var Emitter = require('../emitter/Emitter');
-var utils = require('./utils');
 
 /**
  * @constructor
@@ -328,7 +330,7 @@ var Store = function(initialData) {
     this._data = Array.isArray(initialData) ? initialData.slice() : []; /** @private */
 
     this.initActions();
-    utils.registerStore(this);
+    Dispatcher.register(this._emitter.emit.bind(this._emitter));
 };
 
 /**
@@ -371,6 +373,7 @@ Store.prototype.un = function(name) {
  */
 Store.prototype.create = function(data, index) {
     this._data.splice(isNaN(index) ? this.count() : index, 0, data);
+    this._emitter.emit('change', this.all());
 };
 
 /**
@@ -394,6 +397,7 @@ Store.prototype.destroy = function(fn) {
     this._data = this._data.filter(function(value, i, arr) {
         return !fn(value, i, arr);
     });
+    this._emitter.emit('change', this.all());
 };
 
 /**
@@ -403,6 +407,7 @@ Store.prototype.destroy = function(fn) {
  */
 Store.prototype.destroyAt = function(i) {
     this._data.splice(i, 1);
+    this._emitter.emit('change', this.all());
 };
 
 /**
@@ -411,7 +416,10 @@ Store.prototype.destroyAt = function(i) {
  * @returns {*[]} - The sorted data.
  */
 Store.prototype.sort = function(sortFn) {
-    return this._data.sort(sortFn);
+    this._data.sort(sortFn);
+    this._emitter.emit('change', this.all());
+
+    return this._data;
 };
 
 /**
@@ -420,7 +428,10 @@ Store.prototype.sort = function(sortFn) {
  * @returns {*[]} - The reversed data.
  */
 Store.prototype.reverse = function() {
-    return this._data.reverse();
+    this._data.reverse();
+    this._emitter.emit('change', this.all());
+
+    return this._data;
 };
 
 /**
@@ -447,6 +458,7 @@ Store.prototype.all = function() {
  */
 Store.prototype.empty = function() {
     this._data = [];
+    this._emitter.emit('change', this.all());
 };
 
 /**
@@ -460,26 +472,7 @@ Store.prototype.count = function() {
 
 module.exports = Store;
 
-},{"../emitter/Emitter":3,"./utils":6}],6:[function(require,module,exports){
-var Dispatcher = require('../dispatcher/Dispatcher');
-
-/**
- * @method registerStore
- * Registers a store with the Dispatcher.
- * @param {Object} store - The store to register.
- */
-function registerStore(store) {
-    Dispatcher.register(function(action, data) {
-        if (store._emitter.hasListener(action)) {
-            store._emitter.emit(action, data);
-
-            if (action !== 'change') { //emit change for other listeners
-                store._emitter.emit('change', data);
-            }
-        }
-    }.bind(store));
-}
-
+},{"../dispatcher/Dispatcher":2,"../emitter/Emitter":3}],6:[function(require,module,exports){
 /**
  * @method buildUrl
  * Builds a url for a given remote store.
@@ -539,9 +532,8 @@ function get(url, callback) {
 }
 
 module.exports = {
-    registerStore: registerStore,
     buildUrl: buildUrl,
     get: get
 };
 
-},{"../dispatcher/Dispatcher":2}]},{},[1])
+},{}]},{},[1])
