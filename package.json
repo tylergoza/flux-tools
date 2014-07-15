@@ -3,6 +3,12 @@
   "version": "0.0.29",
   "description": "Tools for the flux architecture.",
   "main": "index.js",
+  "files": [
+    "README.md",
+    "./src/store/Store.js",
+    "./src/store/RemoteStore.js",
+    "./src/dispatcher/Dispatcher.js"
+  ],
   "scripts": {
     "test": "grunt test",
     "prepublish": "grunt publish"
