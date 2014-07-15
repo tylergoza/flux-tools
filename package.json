@@ -5,9 +5,9 @@
   "main": "index.js",
   "files": [
     "README.md",
-    "./src/store/Store.js",
-    "./src/store/RemoteStore.js",
-    "./src/dispatcher/Dispatcher.js"
+    "src/store/Store.js",
+    "src/store/RemoteStore.js",
+    "src/dispatcher/Dispatcher.js"
   ],
   "scripts": {
     "test": "grunt test",
