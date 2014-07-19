@@ -23,6 +23,20 @@ describe('Store', function() {
         assert.equal(addCount, 5);
     });
 
+    it('should apply default actions', function() {
+        var addCount = 0;
+        new Store({
+            actions: {
+                add: function(i) {
+                    addCount += i;
+                }
+            }
+        });
+
+        Dispatcher.dispatch('add', 2);
+        assert.equal(addCount, 2);
+    });
+
     it('should create data', function() {
         var store = new Store();
 
@@ -44,11 +58,13 @@ describe('Store', function() {
 
     it('should filter data', function() {
         var records;
-        var store = new Store([
-            'mock data 1',
-            'mock data 2',
-            'mock data 3'
-        ]);
+        var store = new Store({
+            data:[
+                'mock data 1',
+                'mock data 2',
+                'mock data 3'
+            ]
+        });
 
         records = store.filter(function(data) {
             return data === 'mock data 2';
@@ -59,11 +75,13 @@ describe('Store', function() {
     });
 
     it('should get at a given index', function() {
-        var store = new Store([
-            'mock data 1',
-            'mock data 2',
-            'mock data 3'
-        ]);
+        var store = new Store({
+            data: [
+                'mock data 1',
+                'mock data 2',
+                'mock data 3'
+            ]
+        });
 
         assert.equal(store.at(1), 'mock data 2');
         assert.equal(store.at(2), 'mock data 3');
@@ -72,13 +90,15 @@ describe('Store', function() {
     });
 
     it('should sort data', function() {
-        var store = new Store([{
-            age: 1
-        }, {
-            age: 55
-        }, {
-            age: 11
-        }]);
+        var store = new Store({
+            data: [{
+                age: 1
+            }, {
+                age: 55
+            }, {
+                age: 11
+            }]
+        });
 
         store.sort(function(a, b) {
             return b.age - a.age;
@@ -90,13 +110,15 @@ describe('Store', function() {
     });
 
     it('should reverse data', function() {
-        var store = new Store([{
-            age: 1
-        }, {
-            age: 55
-        }, {
-            age: 11
-        }]);
+        var store = new Store({
+            data: [{
+                age: 1
+            }, {
+                age: 55
+            }, {
+                age: 11
+            }]
+        });
 
         store.reverse();
 
@@ -106,12 +128,14 @@ describe('Store', function() {
     });
 
     it('should remove data', function() {
-        var store = new Store([
-            'mock data 1',
-            'mock data 2',
-            'mock data 1',
-            'mock data 3'
-        ]);
+        var store = new Store({
+            data: [
+                'mock data 1',
+                'mock data 2',
+                'mock data 1',
+                'mock data 3'
+            ]
+        });
 
         assert.equal(store.count(), 4);
         store.destroy(function(data) {
@@ -121,12 +145,14 @@ describe('Store', function() {
     });
 
     it('should remove data at an index', function() {
-        var store = new Store([
-            'mock data 1',
-            'mock data 2',
-            'mock data 1',
-            'mock data 3'
-        ]);
+        var store = new Store({
+            data: [
+                'mock data 1',
+                'mock data 2',
+                'mock data 1',
+                'mock data 3'
+            ]
+        });
 
         assert.equal(store.count(), 4);
         store.destroyAt(1);
@@ -139,7 +165,9 @@ describe('Store', function() {
     });
 
     it('should empty data', function() {
-        var store = new Store(['mock data 1']);
+        var store = new Store({
+            data: ['mock data 1']
+        });
 
         assert.equal(store.count(), 1);
         store.empty();

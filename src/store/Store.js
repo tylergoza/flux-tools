@@ -2,15 +2,22 @@
 
 var Dispatcher = require('../dispatcher/Dispatcher');
 var Emitter = require('../emitter/Emitter');
+var utils = require('./utils');
 
 /**
  * @constructor
  * Creates a new store.
  * @param {*[]} initialData - An array of initial data.
  */
-var Store = function(initialData) {
+var Store = function(cfg) {
+    cfg = utils.config({
+        actions: {},
+        data: []
+    }, cfg);
+
     this._emitter = new Emitter(); /** @private */
-    this._data = Array.isArray(initialData) ? initialData.slice() : []; /** @private */
+    this._actions = cfg.actions; /** @private */
+    this._data = cfg.data; /** @private */
 
     this.initActions();
     Dispatcher.register(this._emitter.emit.bind(this._emitter));
@@ -19,11 +26,13 @@ var Store = function(initialData) {
 /**
  * @method initActions
  * Initializes the actions for this store.
- * Should be overridden by sub-classes.
+ * Can be overridden by sub-classes.
  * Should contain several calls to the 'on' method.
  */
 Store.prototype.initActions = function() {
-    return;
+    Object.getOwnPropertyNames(this._actions).forEach(function(action) {
+        this.on(action, this._actions[action]);
+    }, this);
 };
 
 /**

@@ -11,7 +11,8 @@ var utils = require('./utils');
  * @param {*[]} initialData - An array of initial data.
  */
 var RemoteStore = function(cfg) {
-    var cfgDefaults = {
+    cfg = utils.config({
+        actions: {},
         url: '',
         filterParam: 'filters',
         filters: [],
@@ -22,16 +23,10 @@ var RemoteStore = function(cfg) {
         sorters: [],
         data: [],
         meta: {}
-    };
-    cfg = cfg || {};
-
-    Object.getOwnPropertyNames(cfgDefaults).forEach(function(prop) {
-        if (!cfg[prop]) {
-            cfg[prop] = cfgDefaults[prop];
-        }
-    });
+    }, cfg);
 
     this._emitter = new Emitter(); /** @private */
+    this._actions = cfg.actions; /** @private */
     this._data = cfg.data; /** @private */
     this._meta = cfg.meta; /** @private */
     this._url = cfg.url; /** @private */

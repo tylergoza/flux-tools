@@ -56,7 +56,25 @@ function get(url, callback) {
     request.send();
 }
 
+/**
+ * @method config
+ * Merges the given configs.
+ */
+function config(cfgDefaults, cfg) {
+    cfgDefaults = cfgDefaults || {};
+    cfg = cfg || {};
+
+    Object.getOwnPropertyNames(cfgDefaults).forEach(function(prop) {
+        if (!cfg[prop]) {
+            cfg[prop] = cfgDefaults[prop];
+        }
+    });
+
+    return cfg;
+}
+
 module.exports = {
     buildUrl: buildUrl,
-    get: get
+    get: get,
+    config: config
 };
