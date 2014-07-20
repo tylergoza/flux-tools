@@ -173,5 +173,28 @@ describe('Store', function() {
         store.empty();
         assert.equal(store.count(), 0);
     });
+
+    it('should load data', function() {
+        var store = new Store({
+            data: ['mock data 1']
+        });
+
+        assert.equal(store.count(), 1);
+
+        //replace data
+        store.loadData(['mock data new 1', 'mock data new 2']);
+        assert.equal(store.count(), 2);
+        assert.deepEqual(store.all(), ['mock data new 1', 'mock data new 2']);
+
+        //try with empty data
+        store.loadData();
+        assert.equal(store.count(), 2);
+        assert.deepEqual(store.all(), ['mock data new 1', 'mock data new 2']);
+
+        //append data
+        store.loadData(['mock data new 3'], true);
+        assert.equal(store.count(), 3);
+        assert.deepEqual(store.all(), ['mock data new 1', 'mock data new 2', 'mock data new 3']);
+    });
 });
 

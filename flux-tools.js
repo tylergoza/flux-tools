@@ -160,8 +160,9 @@ Object.getOwnPropertyNames(Store.prototype).forEach(function(prop) {
  * Loads remote data into the store.
  * Makes a get request to the store's url.
  * Adds filters and sorters as GET parameters.
+ * @param {Boolean} silent - True to skip emitting the change event.
  */
-RemoteStore.prototype.load = function() {
+RemoteStore.prototype.load = function(silent) {
     var url = utils.buildUrl(this);
 
     utils.get(url, function(err, request) {
@@ -174,7 +175,7 @@ RemoteStore.prototype.load = function() {
         data = JSON.parse(request.responseText);
         this._meta = data[this._metaParam] || {};
         this._data = data[this._rootParam] || [];
-        this._emitter.emit('change', this.all());
+        this._emitChange(silent);
     }.bind(this));
 };
 
@@ -374,10 +375,24 @@ Store.prototype.un = function(name) {
  * Adds a record to the store.
  * @param {Object} data - The data to add.
  * @param {Number} index[index=this.count()] - The position to insert the data.
+ * @param {Boolean} silent - True to skip emitting the change event.
  */
-Store.prototype.create = function(data, index) {
+Store.prototype.create = function(data, index, silent) {
     this._data.splice(isNaN(index) ? this.count() : index, 0, data);
-    this._emitter.emit('change', this.all());
+    this._emitChange(silent);
+};
+
+/**
+ * @method loadData
+ * Loads data into the store. Replaces store data by default. Can append data with flag.
+ * @param {*[]} data - An array of data to add to or replace the store's data.
+ * @param {Boolean} silent - True to skip emitting the change event.
+ */
+Store.prototype.loadData = function(data, append, silent) {
+    if (Array.isArray(data)) {
+        this._data = append ? this._data.concat(data) : data;
+        this._emitChange(silent);
+    }
 };
 
 /**
@@ -396,32 +411,35 @@ Store.prototype.filter = function(fn) {
  * Removes data using the given function.
  * Removes all data that matches the predicate.
  * @param {Function} fn - The predicate used to remove an item.
+ * @param {Boolean} silent - True to skip emitting the change event.
  */
-Store.prototype.destroy = function(fn) {
+Store.prototype.destroy = function(fn, silent) {
     this._data = this._data.filter(function(value, i, arr) {
         return !fn(value, i, arr);
     });
-    this._emitter.emit('change', this.all());
+    this._emitChange(silent);
 };
 
 /**
  * @method destroyAt
  * Removes data at the given index.
+ * @param {Boolean} silent - True to skip emitting the change event.
  * @param {Number} index - The index at which to remove data.
  */
-Store.prototype.destroyAt = function(i) {
+Store.prototype.destroyAt = function(i, silent) {
     this._data.splice(i, 1);
-    this._emitter.emit('change', this.all());
+    this._emitChange(silent);
 };
 
 /**
  * @method sort
  * Sorts the store's data given the sort method.
+ * @param {Boolean} silent - True to skip emitting the change event.
  * @returns {*[]} - The sorted data.
  */
-Store.prototype.sort = function(sortFn) {
+Store.prototype.sort = function(sortFn, silent) {
     this._data.sort(sortFn);
-    this._emitter.emit('change', this.all());
+    this._emitChange(silent);
 
     return this._data;
 };
@@ -429,11 +447,12 @@ Store.prototype.sort = function(sortFn) {
 /**
  * @method reverse
  * Reverses the store's data.
+ * @param {Boolean} silent - True to skip emitting the change event.
  * @returns {*[]} - The reversed data.
  */
-Store.prototype.reverse = function() {
+Store.prototype.reverse = function(silent) {
     this._data.reverse();
-    this._emitter.emit('change', this.all());
+    this._emitChange(silent);
 
     return this._data;
 };
@@ -459,10 +478,11 @@ Store.prototype.all = function() {
 /**
  * @method empty
  * Removes all data from the store.
+ * @param {Boolean} silent - True to skip emitting the change event.
  */
-Store.prototype.empty = function() {
+Store.prototype.empty = function(silent) {
     this._data = [];
-    this._emitter.emit('change', this.all());
+    this._emitChange(silent);
 };
 
 /**
@@ -472,6 +492,18 @@ Store.prototype.empty = function() {
  */
 Store.prototype.count = function() {
     return this._data.length;
+};
+
+/**
+ * @method _emitChange
+ * @private
+ * Emits the change event unless silent is true.
+ * @param {Boolean} silent - True to skip emitting the change event.
+ */
+Store.prototype._emitChange = function(silent) {
+    if (!silent) {
+        this._emitter.emit('change', this.all());
+    }
 };
 
 module.exports = Store;

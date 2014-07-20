@@ -56,8 +56,9 @@ Object.getOwnPropertyNames(Store.prototype).forEach(function(prop) {
  * Loads remote data into the store.
  * Makes a get request to the store's url.
  * Adds filters and sorters as GET parameters.
+ * @param {Boolean} silent - True to skip emitting the change event.
  */
-RemoteStore.prototype.load = function() {
+RemoteStore.prototype.load = function(silent) {
     var url = utils.buildUrl(this);
 
     utils.get(url, function(err, request) {
@@ -70,7 +71,7 @@ RemoteStore.prototype.load = function() {
         data = JSON.parse(request.responseText);
         this._meta = data[this._metaParam] || {};
         this._data = data[this._rootParam] || [];
-        this._emitter.emit('change', this.all());
+        this._emitChange(silent);
     }.bind(this));
 };
 
