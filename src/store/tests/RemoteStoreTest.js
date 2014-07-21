@@ -71,6 +71,28 @@ describe('RemoteStore', function() {
         assert.equal(store.count(), 2);
     });
 
+    it('should auto load remote data', function() {
+        var store;
+
+        expectedUrl = '/hello-world/';
+        store = new RemoteStore({
+            url: '/hello-world/',
+            autoLoad: true
+        });
+        assert.equal(openCount, 1);
+        assert.equal(sendCount, 1);
+
+        assert.deepEqual(store.all(), [{
+            name: 'John Smith'
+        }, {
+            name: 'Jane Doe'
+        }]);
+        assert.deepEqual(store.meta(), {
+            count: 2
+        });
+        assert.equal(store.count(), 2);
+    });
+
     it('should change the url', function() {
         var store = new RemoteStore({
             url: '/hello-world/'

@@ -13,6 +13,7 @@ var utils = require('./utils');
 var RemoteStore = function(cfg) {
     cfg = utils.config({
         actions: {},
+        autoLoad: false,
         url: '',
         filterParam: 'filters',
         filters: [],
@@ -40,6 +41,10 @@ var RemoteStore = function(cfg) {
 
     this.initActions();
     Dispatcher.register(this._emitter.emit.bind(this._emitter));
+
+    if (cfg.autoLoad) {
+        this.load();
+    }
 };
 
 /**
