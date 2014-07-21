@@ -171,7 +171,16 @@ RemoteStore.prototype.clearSorters = function() {
  * @param {String} value - The param value.
  */
 RemoteStore.prototype.addParam = function(param, value) {
-    this._params[param] = value;
+    this._params[param] = value.toString();
+};
+
+/**
+ * @method getParam
+ * Gets the value of the given param name.
+ * @returns {String} - The param value.
+ */
+RemoteStore.prototype.getParam = function(name) {
+    return this._params[name];
 };
 
 /**

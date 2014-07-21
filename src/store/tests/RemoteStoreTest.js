@@ -148,7 +148,7 @@ describe('RemoteStore', function() {
         assert.deepEqual(store._sorters, []);
     });
 
-    it('should add params', function() {
+    it('should add, get, remove, and clear params', function() {
         var store = new RemoteStore({
             url: '/hello-world/'
         });
@@ -158,6 +158,8 @@ describe('RemoteStore', function() {
         store.load();
         assert.equal(openCount, 1);
         assert.equal(sendCount, 1);
+
+        assert.equal(store.getParam('name'), 'Jane');
 
         store.removeParam('name', 'Jane');
         expectedUrl = '/hello-world/';
