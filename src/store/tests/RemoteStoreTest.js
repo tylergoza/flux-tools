@@ -112,7 +112,7 @@ describe('RemoteStore', function() {
         });
 
         store.addFilter('name', 'John');
-        expectedUrl = '/hello-world/?filters=%5B%7B%22property%22%3A%22name%22%2C%22value%22%3A%22John%22%7D%5D';
+        expectedUrl = '/hello-world/?filter=%5B%7B%22property%22%3A%22name%22%2C%22value%22%3A%22John%22%7D%5D';
         store.load();
         assert.equal(openCount, 1);
         assert.equal(sendCount, 1);
@@ -133,7 +133,7 @@ describe('RemoteStore', function() {
         });
 
         store.addSorter('name', 'desc');
-        expectedUrl = '/hello-world/?sorters=%5B%7B%22direction%22%3A%22desc%22%2C%22property%22%3A%22name%22%7D%5D';
+        expectedUrl = '/hello-world/?sort=%5B%7B%22direction%22%3A%22desc%22%2C%22property%22%3A%22name%22%7D%5D';
         store.load();
         assert.equal(openCount, 1);
         assert.equal(sendCount, 1);
