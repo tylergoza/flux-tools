@@ -5,7 +5,7 @@ var RemoteStore = require('./src/RemoteStore');
 var Store = require('./src/Store');
 
 
-module.exports = {
+global.FluxTools = {
     Dispatcher: Dispatcher,
     RemoteStore: RemoteStore,
     Store: Store
