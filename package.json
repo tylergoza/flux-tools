@@ -1,7 +1,7 @@
 {
   "name": "flux-tools",
   "version": "0.1.0",
-  "description": "",
+  "description": "Tools for the flux architecture.",
   "main": "index.js",
   "scripts": {
     "check-coverage": "istanbul check-coverage --branches 100 --functions 100 --lines 100 --statements 100 .coverage/coverage.json",
@@ -10,6 +10,17 @@
     "test": "rm -rf coverage && npm run jshint && npm run cover && npm run check-coverage",
     "build": "browserify browser.js -o flux-tools.js && uglifyjs flux-tools.js -o flux-tools.min.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ambitioninc/flux-tools"
+  },
+  "keywords": [
+    "flux"
+  ],
+  "bugs": {
+    "url": "https://github.com/ambitioninc/flux-tools/issues"
+  },
+  "homepage": "https://github.com/ambitioninc/flux-tools",
   "author": "Ambition Team",
   "license": "MIT",
   "devDependencies": {
