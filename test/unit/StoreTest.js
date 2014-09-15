@@ -27,7 +27,7 @@ describe('Store', function() {
         assert.equal(store.id, utils.uid() - 1);
         assert.equal(store.length, 4);
         assert.deepEqual(store.values, [1, 2, 3, 4]);
-        assert.notEqual(store.values, data);
+        assert.equal(store.values, data);
     });
 
     it('show throw an error without a Dispatcher', function() {

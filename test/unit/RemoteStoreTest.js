@@ -28,7 +28,7 @@ describe('RemoteStore', function() {
         assert.equal(store.length, 4);
         assert.deepEqual(store.params, {cool: true});
         assert.deepEqual(store.values, [1, 2, 3, 4]);
-        assert.notEqual(store.values, data);
+        assert.equal(store.values, data);
     });
 
     it('should add and remove params', function() {
