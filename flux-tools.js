@@ -74,7 +74,7 @@ function Dispatcher() {
 
     self.register = function(cb, id) {
         if (typeof cb !== 'function') {
-            throw new Error('Dispatcher.reigster: callback is not a function');
+            throw new Error('Dispatcher.register: callback is not a function');
         }
 
         id = id || utils.uid();
