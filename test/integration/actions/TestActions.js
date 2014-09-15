@@ -4,15 +4,15 @@ var TestDispatcher = require('../dispatchers/TestDispatcher');
 var TestStore = require('../stores/TestStore');
 
 
-var TestActions = {
-    addLocal: function(item, options) {
+var genericActions = {
+    addLocal: function(id, item, options) {
         TestDispatcher.dispatch({
             action: 'addTest',
             data: {item: item, options: options},
-            id: TestStore.id
+            id: id
         });
     },
-    addGlobal: function(item, options) {
+    addGlobal: function(id, item, options) {
         TestDispatcher.dispatch({
             action: 'addTest',
             data: {item: item, options: options}
@@ -20,4 +20,4 @@ var TestActions = {
     }
 };
 
-module.exports = TestActions;
+module.exports = TestStore.registerActions(genericActions);
