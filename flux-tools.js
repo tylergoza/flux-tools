@@ -1,607 +1,468 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
 'use strict';
 
-var Dispatcher = require('./src/dispatcher/Dispatcher');
-var RemoteStore = require('./src/store/RemoteStore');
-var Store = require('./src/store/Store');
+var Dispatcher = require('./src/Dispatcher');
+var RemoteStore = require('./src/RemoteStore');
+var Store = require('./src/Store');
 
-global.window.FluxTools = {
+
+global.FluxTools = {
     Dispatcher: Dispatcher,
     RemoteStore: RemoteStore,
     Store: Store
 };
 
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./src/dispatcher/Dispatcher":2,"./src/store/RemoteStore":4,"./src/store/Store":5}],2:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./src/Dispatcher":2,"./src/RemoteStore":4,"./src/Store":5}],2:[function(require,module,exports){
 'use strict';
 
-var Dispatcher = {
+var utils = require('./utils');
 
-    _callbacks: [],
 
-    /**
-     * @method register
-     * Stores the given callback.
-     * The callback can then be called by calling {@link dispatch} with the name.
-     * @param {Function} callback - The function to call when dispatched.
-     */
-    register: function(callback) {
-        this._callbacks.push(callback);
-    },
+function Dispatcher() {
+    var self = this;
+    var _callbacks = {};
+    var _pending = {};
+    var _handled = {};
+    var _name = null;
+    var _data = null;
+    var _dispatching = false;
 
-    /**
-     * @method dispatch
-     * Calls each registered function with given data.
-     * @param {String} name - The name of the subscription.
-     * @param {*} data - The data to publish.
-     */
-    dispatch: function(name, data) {
-        this._callbacks.forEach(function(callback) {
-            callback(name, data);
-        });
-    },
-
-    /**
-     * @method empty
-     * Clears all of the callbacks.
-     */
-    empty: function() {
-        this._callbacks = [];
+    function _call(id) {
+        _pending[id] = true;
+        _callbacks[id](_name, _data);
+        _handled[id] = true;
     }
-};
+
+    function _preDispatch(name, data) {
+        _dispatching = true;
+
+        Object.keys(_callbacks).forEach(function(id) {
+            _pending[id] = false;
+            _handled[id] = false;
+        });
+
+        _name = name;
+        _data = data;
+    }
+
+    function _dispatch() {
+        Object.keys(_callbacks).forEach(function(id) {
+            if (_pending[id]) {
+                return;
+            }
+            _call(id);
+        });
+    }
+
+    function _postDispatch() {
+        _data = null;
+        _name = null;
+        _dispatching = false;
+    }
+
+    self.dispatch = function(name, data) {
+        if (_dispatching) {
+            throw new Error('Dispatcher.dispatch: called while dispatching');
+        }
+
+        _preDispatch(name, data);
+        _dispatch();
+        _postDispatch();
+    };
+
+    self.register = function(cb, id) {
+        if (typeof cb !== 'function') {
+            throw new Error('Dispatcher.register: callback is not a function');
+        }
+
+        id = id || utils.uid();
+        _callbacks[id] = cb;
+
+        return id;
+    };
+
+    self.unregister = function(id) {
+        delete _callbacks[id];
+    };
+
+    self.wait = function(ids) {
+        ids.forEach(function(id) {
+            if (!_dispatching) {
+                throw new Error('Dispatcher.wait: called while not dispatching');
+            }
+
+            if (!_callbacks[id]) {
+                throw new Error('Dispatcher.wait: called with missing id');
+            }
+
+            if (_pending[id]) {
+
+                if (!_handled[id]) {
+                    throw new Error('Dispatcher.wait: detected cycle');
+                }
+
+                return;
+            }
+
+            _call(id);
+        });
+    };
+
+    Object.defineProperties(self, {
+        length: {
+            enumerable: true,
+            get: function() {
+                return Object.keys(_callbacks).length;
+            }
+        }
+    });
+}
 
 module.exports = Dispatcher;
 
-},{}],3:[function(require,module,exports){
-var Emitter = function() {
-    this._listeners = {}; /** @private */
-};
+},{"./utils":6}],3:[function(require,module,exports){
+'use strict';
 
-/**
- * @addListener
- * Adds a listener to the emitter.
- * @param {String} name - The name of the listener to add.
- * @param {Function) fn - The method to call when emitted.
- */
-Emitter.prototype.addListener = function(name, fn) {
-    this._listeners[name] = fn;
-};
+function Emitter() {
+    var self = this;
+    var _listeners = {};
 
-/**
- * @removeListener
- * Removes a listener from the emitter.
- * @param {String} name - The name of the listener to remove.
- */
-Emitter.prototype.removeListener = function(name) {
-    delete this._listeners[name];
-};
+    self.addListener = function(name, callback) {
+        if (typeof callback !== 'function' || self.hasListener(name, callback)) {
+            return false;
+        }
 
-/**
- * @hasListener
- * Checks for a callable listener at the given name.
- * @param {String} name - The name of the listener to test.
- * @returns {Boolean} - True if the listener is callable.
- */
-Emitter.prototype.hasListener = function(name) {
-    return typeof this._listeners[name] === 'function';
-};
+        _listeners[name] = _listeners[name] || [];
+        _listeners[name].push(callback);
 
-/**
- * @emit
- * Calls the listener at the given name with the given data.
- * @param {String} name - The name of the listener to call.
- * @param {*} data - The data payload.
- */
-Emitter.prototype.emit = function(name, data) {
-    if (this.hasListener(name)) {
-        this._listeners[name](data);
-    }
-};
+        return true;
+    };
+
+    self.emit = function(name, data) {
+        if (!_listeners[name]) {
+            return false;
+        }
+
+        _listeners[name].forEach(function(callback) {
+            callback(data);
+        });
+
+        return true;
+    };
+
+    self.hasListener = function(name, callback) {
+        var callbacks = _listeners[name];
+
+        if (!callbacks || callbacks.indexOf(callback) === -1) {
+            return false;
+        }
+
+        return true;
+    };
+
+    self.removeListener = function(name, callback) {
+        if (!self.hasListener(name, callback)) {
+            return false;
+        }
+
+        _listeners[name] = _listeners[name].filter(function(cb) {
+            return cb !== callback;
+        });
+
+        if (!_listeners[name].length) {
+            delete _listeners[name];
+        }
+
+        return true;
+    };
+}
 
 module.exports = Emitter;
 
 },{}],4:[function(require,module,exports){
 'use strict';
 
-var Dispatcher = require('../dispatcher/Dispatcher');
-var Emitter = require('../emitter/Emitter');
 var Store = require('./Store');
 var utils = require('./utils');
 
-/**
- * @constructor
- * Creates a new remote store.
- * @param {*[]} initialData - An array of initial data.
- */
-var RemoteStore = function(cfg) {
-    cfg = utils.config({
-        actions: {},
-        autoLoad: false,
-        url: '',
-        filterParam: 'filter',
-        filters: [],
-        metaParam: 'meta',
+
+function RemoteStore(cfg) {
+    var self = this;
+    var _cfg, _params, _parse, _url;
+
+    _cfg = utils.config({
         params: {},
-        rootParam: 'objects',
-        sorterParam: 'sort',
-        sorters: [],
-        data: [],
-        meta: {}
-    }, cfg);
+        parse: utils.parse,
+        url: ''
+    }, cfg, 'RemoteStore');
+    _params = _cfg.params;
+    _parse = _cfg.parse;
+    _url = _cfg.url;
 
-    this._emitter = new Emitter(); /** @private */
-    this._actions = cfg.actions; /** @private */
-    this._data = cfg.data; /** @private */
-    this._meta = cfg.meta; /** @private */
-    this._url = cfg.url; /** @private */
-    this._filterParam = cfg.filterParam; /** @private */
-    this._filters = cfg.filters; /** @private */
-    this._params = cfg.params; /** @private */
-    this._sorterParam = cfg.sorterParam;
-    this._sorters = cfg.sorters; /** @private */
-    this._rootParam = cfg.rootParam; /** @private */
-    this._metaParam = cfg.metaParam; /** @private */
+    self.addParam = function(k, v) {
+        _params[k] = v;
 
-    this.initActions();
-    Dispatcher.register(this._emitter.emit.bind(this._emitter));
+        return self;
+    };
 
-    if (cfg.autoLoad) {
-        this.load();
-    }
-};
+    self.clearParams = function() {
+        _params = {};
+    };
 
-/**
- * @extends Store
- */
-Object.getOwnPropertyNames(Store.prototype).forEach(function(prop) {
-    if (prop !== 'constructor') {
-        RemoteStore.prototype[prop] = Store.prototype[prop];
-    }
-});
+    self.removeParam = function(k) {
+        delete _params[k];
 
-/**
- * @method load
- * Loads remote data into the store.
- * Makes a get request to the store's url.
- * Adds filters and sorters as GET parameters.
- * @param {Boolean} silent - True to skip emitting the change event.
- */
-RemoteStore.prototype.load = function(silent) {
-    var url = utils.buildUrl(this);
+        return self;
+    };
 
-    utils.get(url, function(err, request) {
-        var data;
+    self.setParams = function(p) {
+        _params = utils.merge(p);
 
-        if (err) {
-            return;
+        return self;
+    };
+
+    self.setUrl = function(url) {
+        _url = url;
+    };
+
+    self.load = function(opts) {
+        utils.request(utils.url(_url, _params), function(err, req) {
+            self.set(_parse(req), opts);
+        });
+    };
+
+    Object.defineProperties(self, {
+        params: {
+            enumerable: true,
+            get: function() {
+                return utils.merge(_params);
+            }
+        },
+        url: {
+            enumerable: true,
+            get: function() {
+                return _url;
+            }
         }
-
-        data = JSON.parse(request.responseText);
-        this._meta = data[this._metaParam] || {};
-        this._data = data[this._rootParam] || [];
-        this._emitChange(silent);
-    }.bind(this));
-};
-
-/**
- * @method setUrl
- * Sets the store's url.
- * @param {String} url - The new url.
- */
-RemoteStore.prototype.setUrl = function(url) {
-    this._url = url;
-};
-
-/**
- * @method getUrl
- * Gets the store's url.
- * @returns {String} - The store's url.
- */
-RemoteStore.prototype.getUrl = function() {
-    return this._url;
-};
-
-/**
- * @method addFilter
- * Adds a filter to the store.
- * @param {String} property - The property to filter on.
- * @param {String} value - The value to filter on.
- */
-RemoteStore.prototype.addFilter = function(property, value) {
-    this._filters.push({
-        property: property,
-        value: value
     });
-};
 
-/**
- * @method removeFilter
- * Removes all filters that have the given property and value.
- * @param {String} property - The property to filter on.
- * @param {String} value - The value to filter on.
- */
-RemoteStore.prototype.removeFilter = function(property, value) {
-    this._filters = this._filters.filter(function(filter) {
-        return !(filter.property === property && filter.value === value);
-    });
-};
-
-/**
- * @method clearFilters
- * Removes all filters.
- */
-RemoteStore.prototype.clearFilters = function() {
-    this._filters = [];
-};
-
-/**
- * @method addSorter
- * Adds a sorter to the store.
- * @param {String} property - The property to sort on.
- * @param {String} direction - The direction to sort.
- */
-RemoteStore.prototype.addSorter = function(property, direction) {
-    this._sorters.push({
-        direction: direction,
-        property: property
-    });
-};
-
-/**
- * @method removeSorter
- * Removes all sorters that have the given property and direction.
- * @param {String} property - The property to sort on.
- * @param {String} direction - The direction to sort.
- */
-RemoteStore.prototype.removeSorter = function(property, direction) {
-    this._sorters = this._sorters.filter(function(filter) {
-        return !(filter.property === property && filter.direction === direction);
-    });
-};
-
-/**
- * @method clearSorters
- * Removes all sorters.
- */
-RemoteStore.prototype.clearSorters = function() {
-    this._sorters = [];
-};
-
-/**
- * @method addParam
- * Adds a param to the store.
- * @param {String} param - The name of the param.
- * @param {String} value - The param value.
- */
-RemoteStore.prototype.addParam = function(param, value) {
-    this._params[param] = value.toString();
-};
-
-/**
- * @method getParam
- * Gets the value of the given param name.
- * @returns {String} - The param value.
- */
-RemoteStore.prototype.getParam = function(name) {
-    return this._params[name];
-};
-
-/**
- * @method removeParam
- * Removes a param from the store.
- * @param {String} param - The name of the param.
- */
-RemoteStore.prototype.removeParam = function(param) {
-    delete this._params[param];
-};
-
-/**
- * @method clearParams
- * Removes all params.
- */
-RemoteStore.prototype.clearParams = function() {
-    this._params = {};
-};
-
-/**
- * @method meta
- * Gets the store's meta data.
- * @returns {Object} - The store's meta data.
- */
- RemoteStore.prototype.meta = function() {
-    return this._meta;
- };
-
-/**
- * @method count
- * Gets the number of data items in the store.
- * @returns {Number} - The number of data items in the store.
- */
-RemoteStore.prototype.count = function() {
-    return this._data.length;
-};
+    Store.prototype.constructor.call(self, cfg);
+}
 
 module.exports = RemoteStore;
 
-},{"../dispatcher/Dispatcher":2,"../emitter/Emitter":3,"./Store":5,"./utils":6}],5:[function(require,module,exports){
+},{"./Store":5,"./utils":6}],5:[function(require,module,exports){
 'use strict';
 
-var Dispatcher = require('../dispatcher/Dispatcher');
-var Emitter = require('../emitter/Emitter');
+var Emitter = require('./Emitter');
 var utils = require('./utils');
 
-/**
- * @constructor
- * Creates a new store.
- * @param {*[]} initialData - An array of initial data.
- */
-var Store = function(cfg) {
-    cfg = utils.config({
-        actions: {},
+function Store(cfg) {
+    var self = this;
+    var _cfg, _data, _dispatcher, _emitter, _id, _handlers;
+
+    _cfg = utils.config({
         data: []
-    }, cfg);
+    }, cfg, 'Store');
+    _data = _cfg.data;
+    _dispatcher = _cfg.dispatcher;
+    _emitter = new Emitter();
+    _id = utils.uid();
+    _handlers = {
+        _global: {}
+    };
 
-    this._emitter = new Emitter(); /** @private */
-    this._actions = cfg.actions; /** @private */
-    this._data = cfg.data; /** @private */
+    self.off = function(name, callback) {
+        return _emitter.removeListener(name, callback);
+    };
 
-    this.initActions();
-    Dispatcher.register(this._emitter.emit.bind(this._emitter));
-};
+    self.on = function(name, callback) {
+        return _emitter.addListener(name, callback);
+    };
 
-/**
- * @method initActions
- * Initializes the actions for this store.
- * Can be overridden by sub-classes.
- * Should contain several calls to the 'on' method.
- */
-Store.prototype.initActions = function() {
-    Object.getOwnPropertyNames(this._actions).forEach(function(action) {
-        this.on(action, this._actions[action]);
-    }, this);
-};
+    self.emit = function(name, data) {
+        return _emitter.emit(name, data);
+    };
 
-/**
- * @method on
- * Adds an event listener.
- * The event 'change' is a special listener. It is called by all other listeners.
- * @param {String} name - The name of the subscription.
- * @param {Function} callback - The function to call when {@link name} is emitted.
- */
-Store.prototype.on = function(name, callback) {
-    this._emitter.addListener(name, function(data) {
-        callback.call(this, data);
-    }.bind(this));
-};
+    self.add = function(v, o) {
+        var i;
 
-/**
- * @method un
- * Removes an event listener.
- * @param {String} name - The name of the listener to cancel.
- */
-Store.prototype.un = function(name) {
-    this._emitter.removeListener(name);
-};
+        o = new Object(o);
+        i = o.at > -1 ? o.at : _data.length;
+        _data.splice(i, 0, v);
+        utils.change(self, o);
 
-/**
- * @method create
- * Adds a record to the store.
- * @param {Object} data - The data to add.
- * @param {Number} index[index=this.count()] - The position to insert the data.
- * @param {Boolean} silent - True to skip emitting the change event.
- */
-Store.prototype.create = function(data, index, silent) {
-    this._data.splice(isNaN(index) ? this.count() : index, 0, data);
-    this._emitChange(silent);
-};
+        return self;
+    };
 
-/**
- * @method loadData
- * Loads data into the store. Replaces store data by default. Can append data with flag.
- * @param {*[]} data - An array of data to add to or replace the store's data.
- * @param {Boolean} silent - True to skip emitting the change event.
- */
-Store.prototype.loadData = function(data, append, silent) {
-    if (Array.isArray(data)) {
-        this._data = append ? this._data.concat(data) : data;
-        this._emitChange(silent);
-    }
-};
+    self.remove = function(o) {
+       var i;
 
-/**
- * @method filter
- * Finds data using the given function.
- * Finds all data that matches the predicate.
- * @param {Function} fn - The predicate used to find items.
- * @returns {*[]} - An array of matched data.
- */
-Store.prototype.filter = function(fn) {
-    return this._data.filter(fn);
-};
+        o = new Object(o);
+        i = o.at > -1 ? o.at : _data.length - 1;
+        _data.splice(i, 1);
+        utils.change(self, o);
 
-/**
- * @method destroy
- * Removes data using the given function.
- * Removes all data that matches the predicate.
- * @param {Function} fn - The predicate used to remove an item.
- * @param {Boolean} silent - True to skip emitting the change event.
- */
-Store.prototype.destroy = function(fn, silent) {
-    this._data = this._data.filter(function(value, i, arr) {
-        return !fn(value, i, arr);
+        return self;
+    };
+
+    self.clear = function(o) {
+        o = new Object(o);
+
+        while (_data.length) {
+            _data.pop();
+        }
+
+        utils.change(self, o);
+
+        return self;
+    };
+
+    self.set = function(data, o) {
+        o = new Object(o);
+
+        _data = Array.isArray(data) ? data.map(function(v) {
+            return v;
+        }) : [data];
+
+        utils.change(self, o);
+
+        return self;
+    };
+
+    self.registerHandlers = function(handlers, id) {
+        if (id) {
+            _handlers[id] = handlers;
+        } else {
+            _handlers._global = handlers;
+        }
+    };
+
+    self.unregisterHandlers = function(id) {
+        if (id) {
+            delete _handlers[id];
+        } else {
+            _handlers._global = {};
+        }
+    };
+
+    Object.defineProperties(self, {
+        id: {
+            enumerable: true,
+            get: function() {
+                return _id;
+            }
+        },
+        length: {
+            enumerable: true,
+            get: function() {
+                return _data.length;
+            }
+        },
+        handlers: {
+            enumerable: true,
+            get: function() {
+                return utils.merge(_handlers);
+            }
+        },
+        values: {
+            enumerable: true,
+            get: function() {
+                return _data.slice();
+            }
+        }
     });
-    this._emitChange(silent);
-};
 
-/**
- * @method destroyAt
- * Removes data at the given index.
- * @param {Boolean} silent - True to skip emitting the change event.
- * @param {Number} index - The index at which to remove data.
- */
-Store.prototype.destroyAt = function(i, silent) {
-    this._data.splice(i, 1);
-    this._emitChange(silent);
-};
+    _dispatcher.register(function(payload) {
+        var cbs = payload.id ? _handlers[payload.id] : _handlers._global;
+        var cb = cbs ? cbs[payload.action] : null;
 
-/**
- * @method sort
- * Sorts the store's data given the sort method.
- * @param {Boolean} silent - True to skip emitting the change event.
- * @returns {*[]} - The sorted data.
- */
-Store.prototype.sort = function(sortFn, silent) {
-    this._data.sort(sortFn);
-    this._emitChange(silent);
-
-    return this._data;
-};
-
-/**
- * @method reverse
- * Reverses the store's data.
- * @param {Boolean} silent - True to skip emitting the change event.
- * @returns {*[]} - The reversed data.
- */
-Store.prototype.reverse = function(silent) {
-    this._data.reverse();
-    this._emitChange(silent);
-
-    return this._data;
-};
-
-/**
- * @method at
- * Gets the item at the given index.
- * @param {Number} index - The index to get.
- */
- Store.prototype.at = function(index) {
-    return this.all()[index];
- };
-
-/**
- * @method all
- * Gets an array of all data from the store.
- * @returns {*[]} - All the store's data.
- */
-Store.prototype.all = function() {
-    return this._data.slice();
-};
-
-/**
- * @method empty
- * Removes all data from the store.
- * @param {Boolean} silent - True to skip emitting the change event.
- */
-Store.prototype.empty = function(silent) {
-    this._data = [];
-    this._emitChange(silent);
-};
-
-/**
- * @method count
- * Gets the number of data items in the store.
- * @returns {Number} - The number of data items in the store.
- */
-Store.prototype.count = function() {
-    return this._data.length;
-};
-
-/**
- * @method _emitChange
- * @private
- * Emits the change event unless silent is true.
- * @param {Boolean} silent - True to skip emitting the change event.
- */
-Store.prototype._emitChange = function(silent) {
-    if (!silent) {
-        this._emitter.emit('change', this.all());
-    }
-};
+        if (typeof cb === 'function') {
+            cb.call(self, payload.data);
+        }
+    }, _id);
+}
 
 module.exports = Store;
 
-},{"../dispatcher/Dispatcher":2,"../emitter/Emitter":3,"./utils":6}],6:[function(require,module,exports){
-/**
- * @method buildUrl
- * Builds a url for a given remote store.
- * @param {Object} store - The remote store for which to build a url.
- * @returns {String} - The built url.
- */
-function buildUrl(store) {
-    var url = store._url + '?';
+},{"./Emitter":3,"./utils":6}],6:[function(require,module,exports){
+'use strict';
 
-    //add extra params
-    Object.getOwnPropertyNames(store._params).forEach(function(param) {
-        url +=
-            encodeURIComponent(param) + '=' +
-            encodeURIComponent(store._params[param]) + '&';
-    }, store);
+var _uid = 1;
+var utils;
 
-    //add filters
-    if (store._filters.length) {
-        url +=
-            encodeURIComponent(store._filterParam) + '=' +
-            encodeURIComponent(JSON.stringify(store._filters)) + '&';
-    }
-
-    //add sorters
-    if (store._sorters.length) {
-        url +=
-            encodeURIComponent(store._sorterParam) + '=' +
-            encodeURIComponent(JSON.stringify(store._sorters)) + '&';
-    }
-
-    return url.slice(0, -1);
-}
-
-/**
- * @method get
- * Makes a GET request to the given url, then calls the callback.
- * @param {String} url - The url for the request.
- * @param {Function} callback - The method to call when the request is finished.
- */
-function get(url, callback) {
-    var request = new XMLHttpRequest();
-
-    request.onload = function() {
-        if (request.status >= 200 && request.status < 400) {
-            callback(undefined, request);
-        } else {
-            callback(new Error('RemoteStore: StatusError'), request);
+utils = {
+    change: function(store, opts) {
+        if (!opts.silent) {
+            store.emit('change', store);
         }
-    };
-
-    request.onerror = function() {
-        callback(new Error('RemoteStore: Network Error'), request);
-    };
-
-    request.open('GET', url, true);
-    request.send();
-}
-
-/**
- * @method config
- * Merges the given configs.
- */
-function config(cfgDefaults, cfg) {
-    cfgDefaults = cfgDefaults || {};
-    cfg = cfg || {};
-
-    Object.getOwnPropertyNames(cfgDefaults).forEach(function(prop) {
-        if (!cfg[prop]) {
-            cfg[prop] = cfgDefaults[prop];
+    },
+    config: function(defaults, config, name) {
+        if (!config || !config.dispatcher) {
+            throw new Error(name + ' requires a Dispatcher');
         }
-    });
 
-    return cfg;
-}
+        return utils.merge(defaults, config);
+    },
+    merge: function() {
+        var objs = Array.prototype.slice.call(arguments);
+        var result = {};
 
-module.exports = {
-    buildUrl: buildUrl,
-    get: get,
-    config: config
+        objs.forEach(function(obj) {
+            Object.keys(obj).forEach(function(key) {
+                result[key] = obj[key];
+            });
+        });
+
+        return result;
+    },
+    parse: function(req) {
+        var result;
+
+        try {
+            result = JSON.parse(req.responseText);
+        } catch(e) {
+            result = [];
+        }
+
+        return result;
+    },
+    request: function(url, cb) {
+        var req = new XMLHttpRequest();
+
+        req.onload = function() {
+            if (req.status >= 200 && req.status < 400) {
+                cb(undefined, req);
+            } else {
+                cb(new Error('Store: There was a status error.'), req);
+            }
+        };
+
+        req.onerror = function() {
+            cb(new Error('Store: There was a network error.'), req);
+        };
+
+        req.open('GET', url, true);
+        req.send();
+    },
+    uid: function() {
+        return _uid++;
+    },
+    url: function(v, params) {
+         var result = v + '?';
+
+        Object.keys(params).forEach(function(key) {
+            result +=
+                encodeURIComponent(key) + '=' +
+                encodeURIComponent(params[key]) + '&';
+        });
+
+        return result.slice(0, -1);
+    }
 };
 
-},{}]},{},[1])
+module.exports = utils;
+
+},{}]},{},[1]);
