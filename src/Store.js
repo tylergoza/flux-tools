@@ -114,7 +114,7 @@ function Store(cfg) {
         values: {
             enumerable: true,
             get: function() {
-                return _data.slice();
+                return _data;
             }
         }
     });
