@@ -34,7 +34,7 @@ utils = {
         try {
             result = JSON.parse(req.responseText);
         } catch(e) {
-            result = {};
+            result = [];
         }
 
         return result;

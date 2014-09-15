@@ -57,10 +57,21 @@ describe('RemoteStore', function() {
          assert.deepEqual(store.params, {});
     });
 
+    it('should set a url', function() {
+        var store = new RemoteStore({
+            dispatcher: mockDispatcher
+        });
+
+        assert.equal(store.url, '');
+        store.setUrl('/cool/');
+        assert.equal(store.url, '/cool/');
+    });
+
     it('should load', function() {
         var store = new RemoteStore({
             dispatcher: mockDispatcher,
-            params: {cool: true}
+            params: {cool: true},
+            url: '/cool/'
         });
         var open = stub();
 
@@ -78,11 +89,13 @@ describe('RemoteStore', function() {
                 req.onload();
 
                 req.status = 200;
-                req.responseText = JSON.stringify({mock: 1});
+                req.responseText = JSON.stringify([1, 2, 3]);
                 req.onload();
             };
         };
 
         store.load();
+        assert.equal(open.calledWith('GET', '/cool/?cool=true', true), true);
+        assert.deepEqual(store.values, [1, 2, 3]);
     });
 });

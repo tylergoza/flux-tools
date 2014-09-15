@@ -223,6 +223,10 @@ function RemoteStore(cfg) {
         return self;
     };
 
+    self.setUrl = function(url) {
+        _url = url;
+    };
+
     self.load = function(opts) {
         utils.request(utils.url(_url, _params), function(err, req) {
             self.set(_parse(req), opts);
@@ -234,6 +238,12 @@ function RemoteStore(cfg) {
             enumerable: true,
             get: function() {
                 return utils.merge(_params);
+            }
+        },
+        url: {
+            enumerable: true,
+            get: function() {
+                return _url;
             }
         }
     });
@@ -414,7 +424,7 @@ utils = {
         try {
             result = JSON.parse(req.responseText);
         } catch(e) {
-            result = {};
+            result = [];
         }
 
         return result;
