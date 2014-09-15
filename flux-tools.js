@@ -348,6 +348,16 @@ function Store(cfg) {
         }
     };
 
+    self.registerActions = function(actions) {
+        var _actions = {};
+
+        Object.keys(actions).forEach(function(key) {
+            _actions[key] = actions[key].bind(self, _id);
+        });
+
+        return _actions;
+    };
+
     Object.defineProperties(self, {
         id: {
             enumerable: true,
