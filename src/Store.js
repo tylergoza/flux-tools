@@ -96,7 +96,7 @@ function Store(cfg) {
         var _actions = {};
 
         Object.keys(actions).forEach(function(key) {
-            _actions[key] = actions[key].bind(self, _id);
+            _actions[key] = actions[key].bind(self, _id, _dispatcher);
         });
 
         return _actions;
