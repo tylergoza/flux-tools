@@ -1,19 +1,18 @@
 'use strict';
 
-var TestDispatcher = require('../dispatchers/TestDispatcher');
 var TestStore = require('../stores/TestStore');
 
 
 var genericActions = {
-    addLocal: function(id, item, options) {
-        TestDispatcher.dispatch({
+    addLocal: function(id, dispatcher, item, options) {
+        dispatcher.dispatch({
             action: 'addTest',
             data: {item: item, options: options},
             id: id
         });
     },
-    addGlobal: function(id, item, options) {
-        TestDispatcher.dispatch({
+    addGlobal: function(id, dispatcher, item, options) {
+        dispatcher.dispatch({
             action: 'addTest',
             data: {item: item, options: options}
         });
