@@ -5,7 +5,6 @@ var stub = require('sinon').stub;
 
 var TestActions = require('./actions/TestActions');
 var TestActionsOther = require('./actions/TestActionsOther');
-var TestDispatcher = require('./dispatchers/TestDispatcher');
 var TestStore = require('./stores/TestStore');
 
 
@@ -15,10 +14,12 @@ describe('Flux', function() {
 
         TestStore.on('change', onStoreChange);
 
+        //should respond to local
         TestActions.addLocal(777);
         assert.equal(onStoreChange.callCount, 1);
         assert.deepEqual(TestStore.data, 777);
 
+        //should respond to global
         TestActions.addGlobal(888, {silent: true});
         assert.equal(onStoreChange.callCount, 1);
         assert.deepEqual(TestStore.data, 888);
@@ -39,7 +40,7 @@ describe('Flux', function() {
         assert.deepEqual(TestStore.data, 888);
 
         //should not respond after unregister
-        TestDispatcher.unregister(TestStore.id);
+        TestStore.dispatcher.unregister(TestStore.id);
         TestActions.addLocal(222);
         assert.equal(onStoreChange.callCount, 1);
         assert.deepEqual(TestStore.data, 888);
