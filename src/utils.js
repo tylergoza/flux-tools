@@ -29,7 +29,7 @@ utils = {
         try {
             result = JSON.parse(req.responseText);
         } catch(e) {
-            result = [];
+            result = null;
         }
 
         return result;
