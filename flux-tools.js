@@ -324,6 +324,12 @@ function Store(cfg) {
     };
 
     Object.defineProperties(self, {
+        dispatcher: {
+            enumerable: true,
+            get: function() {
+                return _dispatcher;
+            }
+        },
         id: {
             enumerable: true,
             get: function() {
@@ -388,7 +394,7 @@ utils = {
         try {
             result = JSON.parse(req.responseText);
         } catch(e) {
-            result = [];
+            result = null;
         }
 
         return result;

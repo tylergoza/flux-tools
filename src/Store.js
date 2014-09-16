@@ -77,6 +77,12 @@ function Store(cfg) {
     };
 
     Object.defineProperties(self, {
+        dispatcher: {
+            enumerable: true,
+            get: function() {
+                return _dispatcher;
+            }
+        },
         id: {
             enumerable: true,
             get: function() {
