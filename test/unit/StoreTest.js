@@ -45,9 +45,6 @@ describe('Store', function() {
 
         assert.deepEqual(store.clear().data, null);
         assert.equal(cb.callCount, 1);
-
-        assert.deepEqual(store.clear({silent: true}).data, null);
-        assert.equal(cb.callCount, 1);
     });
 
     it('should set data', function() {
@@ -81,9 +78,9 @@ describe('Store', function() {
         assert.equal(store.emit('change', 77), true);
         assert.equal(cb.callCount, 1);
         assert.equal(cb.calledWith(77), true);
-
+        assert.equal(store.emit('change', 88, {silent: true}), false);
         assert.equal(store.off('change', cb), true);
-        assert.equal(store.emit('change', 88), false);
+        assert.equal(store.emit('change', 99), false);
         assert.equal(cb.callCount, 1);
     });
 

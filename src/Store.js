@@ -26,30 +26,26 @@ function Store(cfg) {
         return _emitter.addListener(name, callback);
     };
 
-    self.emit = function(name, data) {
+    self.emit = function(name, data, opts) {
+        opts = new Object(opts);
+
+        if (opts.silent) {
+            return false;
+        }
+
         return _emitter.emit(name, data);
     };
 
-    self.clear = function(o) {
-        o = new Object(o);
-
+    self.clear = function(opts) {
         _data = null;
-
-        if (!o.silent) {
-            self.emit('change', _data);
-        }
+        self.emit('change', _data, opts);
 
         return self;
     };
 
-    self.set = function(data, o) {
-        o = new Object(o);
-
+    self.set = function(data, opts) {
         _data = data;
-
-        if (!o.silent) {
-            self.emit('change', _data);
-        }
+        self.emit('change', _data, opts);
 
         return self;
     };
