@@ -92,15 +92,6 @@ function Dispatcher() {
             _call(id);
         });
     };
-
-    Object.defineProperties(self, {
-        length: {
-            enumerable: true,
-            get: function() {
-                return Object.keys(_callbacks).length;
-            }
-        }
-    });
 }
 
 module.exports = Dispatcher;

@@ -25,9 +25,7 @@ describe('Store', function() {
 
         assert.equal(mockDispatcher.register.callCount, 1);
         assert.equal(store.id, utils.uid() - 1);
-        assert.equal(store.length, 4);
-        assert.deepEqual(store.values, [1, 2, 3, 4]);
-        assert.equal(store.values, data);
+        assert.deepEqual(store.data, [1, 2, 3, 4]);
     });
 
     it('show throw an error without a Dispatcher', function() {
@@ -36,32 +34,7 @@ describe('Store', function() {
         }, Error);
     });
 
-    it('should add items', function() {
-        var store = new Store({
-            data: [1, 3, 5],
-            dispatcher: mockDispatcher
-        });
-        var cb = stub();
-
-        store.on('change', cb);
-
-        store.add(7);
-        assert.equal(cb.callCount, 1);
-        assert.equal(store.length, 4);
-        assert.deepEqual(store.values, [1, 3, 5, 7]);
-
-        store.add(3.1, {at: 2});
-        assert.equal(cb.callCount, 2);
-        assert.equal(store.length, 5);
-        assert.deepEqual(store.values, [1, 3, 3.1, 5, 7]);
-
-        store.add(9, {silent: true});
-        assert.equal(cb.callCount, 2);
-        assert.equal(store.length, 6);
-        assert.deepEqual(store.values, [1, 3, 3.1, 5, 7, 9]);
-    });
-
-    it('should remove items', function() {
+    it('should clear data', function() {
         var store = new Store({
             data: [1, 2, 3, 4],
             dispatcher: mockDispatcher
@@ -70,36 +43,11 @@ describe('Store', function() {
 
         store.on('change', cb);
 
-        store.remove();
-        assert.equal(cb.callCount, 1);
-        assert.equal(store.length, 3);
-        assert.deepEqual(store.values, [1, 2, 3]);
-
-        store.remove({at: 1});
-        assert.equal(cb.callCount, 2);
-        assert.equal(store.length, 2);
-        assert.deepEqual(store.values, [1, 3]);
-
-        store.remove({silent: true});
-        assert.equal(cb.callCount, 2);
-        assert.equal(store.length, 1);
-        assert.deepEqual(store.values, [1]);
-    });
-
-    it('should clear items', function() {
-        var store = new Store({
-            data: [1, 2, 3, 4],
-            dispatcher: mockDispatcher
-        });
-        var cb = stub();
-
-        store.on('change', cb);
-
-        assert.deepEqual(store.clear().values, []);
+        assert.deepEqual(store.clear().data, null);
         assert.equal(cb.callCount, 1);
     });
 
-    it('should set the store', function() {
+    it('should set data', function() {
         var store = new Store({
             dispatcher: mockDispatcher
         });
@@ -109,18 +57,15 @@ describe('Store', function() {
 
         store.set([1, 2]);
         assert.equal(cb.callCount, 1);
-        assert.equal(store.length, 2);
-        assert.deepEqual(store.values, [1, 2]);
+        assert.deepEqual(store.data, [1, 2]);
 
         store.set(5);
         assert.equal(cb.callCount, 2);
-        assert.equal(store.length, 1);
-        assert.deepEqual(store.values, [5]);
+        assert.deepEqual(store.data, 5);
 
         store.set([1, 2, 3], {silent: true});
         assert.equal(cb.callCount, 2);
-        assert.equal(store.length, 3);
-        assert.deepEqual(store.values, [1, 2, 3]);
+        assert.deepEqual(store.data, [1, 2, 3]);
     });
 
     it('should handle listeners', function() {
@@ -133,9 +78,9 @@ describe('Store', function() {
         assert.equal(store.emit('change', 77), true);
         assert.equal(cb.callCount, 1);
         assert.equal(cb.calledWith(77), true);
-
+        assert.equal(store.emit('change', 88, {silent: true}), false);
         assert.equal(store.off('change', cb), true);
-        assert.equal(store.emit('change', 88), false);
+        assert.equal(store.emit('change', 99), false);
         assert.equal(cb.callCount, 1);
     });
 

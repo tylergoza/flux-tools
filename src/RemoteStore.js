@@ -53,7 +53,7 @@ function RemoteStore(cfg) {
         params: {
             enumerable: true,
             get: function() {
-                return utils.merge(_params);
+                return _params;
             }
         },
         url: {

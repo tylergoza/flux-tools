@@ -8,7 +8,7 @@ function Store(cfg) {
     var _cfg, _data, _dispatcher, _emitter, _id, _handlers;
 
     _cfg = utils.config({
-        data: []
+        data: null
     }, cfg, 'Store');
     _data = _cfg.data;
     _dispatcher = _cfg.dispatcher;
@@ -26,52 +26,26 @@ function Store(cfg) {
         return _emitter.addListener(name, callback);
     };
 
-    self.emit = function(name, data) {
+    self.emit = function(name, data, opts) {
+        opts = new Object(opts);
+
+        if (opts.silent) {
+            return false;
+        }
+
         return _emitter.emit(name, data);
     };
 
-    self.add = function(v, o) {
-        var i;
-
-        o = new Object(o);
-        i = o.at > -1 ? o.at : _data.length;
-        _data.splice(i, 0, v);
-        utils.change(self, o);
+    self.clear = function(opts) {
+        _data = null;
+        self.emit('change', _data, opts);
 
         return self;
     };
 
-    self.remove = function(o) {
-       var i;
-
-        o = new Object(o);
-        i = o.at > -1 ? o.at : _data.length - 1;
-        _data.splice(i, 1);
-        utils.change(self, o);
-
-        return self;
-    };
-
-    self.clear = function(o) {
-        o = new Object(o);
-
-        while (_data.length) {
-            _data.pop();
-        }
-
-        utils.change(self, o);
-
-        return self;
-    };
-
-    self.set = function(data, o) {
-        o = new Object(o);
-
-        _data = Array.isArray(data) ? data.map(function(v) {
-            return v;
-        }) : [data];
-
-        utils.change(self, o);
+    self.set = function(data, opts) {
+        _data = data;
+        self.emit('change', _data, opts);
 
         return self;
     };
@@ -92,14 +66,14 @@ function Store(cfg) {
         }
     };
 
-    self.registerActions = function(actions) {
-        var _actions = {};
+    self.createActions = function(actions) {
+        var boundActions = {};
 
         Object.keys(actions).forEach(function(key) {
-            _actions[key] = actions[key].bind(self, _id, _dispatcher);
+            boundActions[key] = actions[key].bind(self);
         });
 
-        return _actions;
+        return boundActions;
     };
 
     Object.defineProperties(self, {
@@ -109,19 +83,13 @@ function Store(cfg) {
                 return _id;
             }
         },
-        length: {
-            enumerable: true,
-            get: function() {
-                return _data.length;
-            }
-        },
         handlers: {
             enumerable: true,
             get: function() {
-                return utils.merge(_handlers);
+                return _handlers;
             }
         },
-        values: {
+        data: {
             enumerable: true,
             get: function() {
                 return _data;
