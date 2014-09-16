@@ -11,14 +11,14 @@ var TestStore = new Store({
 //local
 TestStore.registerHandlers({
     addTest: function(payload) {
-        this.add(payload.item, payload.options);
+        this.set(payload.item, payload.options);
     }
 }, TestStore.id);
 
 //global
 TestStore.registerHandlers({
     addTest: function(payload) {
-        this.add(payload.item, payload.options);
+        this.set(payload.item, payload.options);
     }
 });
 

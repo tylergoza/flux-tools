@@ -4,11 +4,6 @@ var _uid = 1;
 var utils;
 
 utils = {
-    change: function(store, opts) {
-        if (!opts.silent) {
-            store.emit('change', store);
-        }
-    },
     config: function(defaults, config, name) {
         if (!config || !config.dispatcher) {
             throw new Error(name + ' requires a Dispatcher');

@@ -7,20 +7,18 @@ var Dispatcher = require('../../src/Dispatcher');
 
 
 describe('Dispatcher', function() {
-    it('should register and unregister callbacks', function() {
+    it('should register callbacks', function() {
         var dispatcher = new Dispatcher();
         var cb = stub();
         var id;
 
         id = dispatcher.register(cb);
-        assert.equal(dispatcher.length, 1);
 
         assert.throws(function() {
             dispatcher.register(null);
         }, Error);
 
-        dispatcher.unregister(id);
-        assert.equal(dispatcher.length, 0);
+        assert.ok(id);
     });
 
     it('should dispatch', function() {

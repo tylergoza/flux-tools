@@ -109,15 +109,6 @@ function Dispatcher() {
             _call(id);
         });
     };
-
-    Object.defineProperties(self, {
-        length: {
-            enumerable: true,
-            get: function() {
-                return Object.keys(_callbacks).length;
-            }
-        }
-    });
 }
 
 module.exports = Dispatcher;
@@ -237,7 +228,7 @@ function RemoteStore(cfg) {
         params: {
             enumerable: true,
             get: function() {
-                return utils.merge(_params);
+                return _params;
             }
         },
         url: {
@@ -264,7 +255,7 @@ function Store(cfg) {
     var _cfg, _data, _dispatcher, _emitter, _id, _handlers;
 
     _cfg = utils.config({
-        data: []
+        data: null
     }, cfg, 'Store');
     _data = _cfg.data;
     _dispatcher = _cfg.dispatcher;
@@ -286,36 +277,14 @@ function Store(cfg) {
         return _emitter.emit(name, data);
     };
 
-    self.add = function(v, o) {
-        var i;
-
-        o = new Object(o);
-        i = o.at > -1 ? o.at : _data.length;
-        _data.splice(i, 0, v);
-        utils.change(self, o);
-
-        return self;
-    };
-
-    self.remove = function(o) {
-       var i;
-
-        o = new Object(o);
-        i = o.at > -1 ? o.at : _data.length - 1;
-        _data.splice(i, 1);
-        utils.change(self, o);
-
-        return self;
-    };
-
     self.clear = function(o) {
         o = new Object(o);
 
-        while (_data.length) {
-            _data.pop();
-        }
+        _data = null;
 
-        utils.change(self, o);
+        if (!o.silent) {
+            self.emit('change', _data);
+        }
 
         return self;
     };
@@ -323,11 +292,11 @@ function Store(cfg) {
     self.set = function(data, o) {
         o = new Object(o);
 
-        _data = Array.isArray(data) ? data.map(function(v) {
-            return v;
-        }) : [data];
+        _data = data;
 
-        utils.change(self, o);
+        if (!o.silent) {
+            self.emit('change', _data);
+        }
 
         return self;
     };
@@ -348,14 +317,14 @@ function Store(cfg) {
         }
     };
 
-    self.registerActions = function(actions) {
-        var _actions = {};
+    self.createActions = function(actions) {
+        var boundActions = {};
 
         Object.keys(actions).forEach(function(key) {
-            _actions[key] = actions[key].bind(self, _id, _dispatcher);
+            boundActions[key] = actions[key].bind(self);
         });
 
-        return _actions;
+        return boundActions;
     };
 
     Object.defineProperties(self, {
@@ -365,19 +334,13 @@ function Store(cfg) {
                 return _id;
             }
         },
-        length: {
-            enumerable: true,
-            get: function() {
-                return _data.length;
-            }
-        },
         handlers: {
             enumerable: true,
             get: function() {
-                return utils.merge(_handlers);
+                return _handlers;
             }
         },
-        values: {
+        data: {
             enumerable: true,
             get: function() {
                 return _data;
@@ -404,11 +367,6 @@ var _uid = 1;
 var utils;
 
 utils = {
-    change: function(store, opts) {
-        if (!opts.silent) {
-            store.emit('change', store);
-        }
-    },
     config: function(defaults, config, name) {
         if (!config || !config.dispatcher) {
             throw new Error(name + ' requires a Dispatcher');

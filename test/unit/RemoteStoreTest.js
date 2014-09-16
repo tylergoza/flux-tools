@@ -25,10 +25,9 @@ describe('RemoteStore', function() {
         });
 
         assert.equal(store.id, utils.uid() - 1);
-        assert.equal(store.length, 4);
         assert.deepEqual(store.params, {cool: true});
-        assert.deepEqual(store.values, [1, 2, 3, 4]);
-        assert.equal(store.values, data);
+        assert.deepEqual(store.data, [1, 2, 3, 4]);
+        assert.equal(store.data, data);
     });
 
     it('should add and remove params', function() {
@@ -96,6 +95,6 @@ describe('RemoteStore', function() {
 
         store.load();
         assert.equal(open.calledWith('GET', '/cool/?cool=true', true), true);
-        assert.deepEqual(store.values, [1, 2, 3]);
+        assert.deepEqual(store.data, [1, 2, 3]);
     });
 });
